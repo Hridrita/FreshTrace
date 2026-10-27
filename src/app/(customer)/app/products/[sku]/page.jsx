@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, MapPin, PackageSearch, Sprout, Tag } from "lucide-react";
 import BatchCard from "@/components/BatchCard";
 import FreshnessBadge from "@/components/FreshnessBadge";
+import ProductPurchasePanel from "@/components/ProductPurchasePanel";
+import { getSession } from "@/lib/auth/session";
 import { getAvailableBatches, getProductBySku } from "@/lib/catalog";
 import {
   formatBDT,
@@ -54,6 +56,12 @@ async function ProductDetail({ sku }) {
   }
 
   const batches = await getAvailableBatches(product.id);
+
+  // The cart belongs to an account, so the add-to-basket control needs to
+  // know whether somebody is signed in. A suspended account is treated as
+  // signed out, matching the customer shell's header.
+  const session = await getSession();
+  const isSignedIn = Boolean(session?.user && session.user.status !== "suspended");
 
   // The cheapest batch currently on offer is the headline price.
   const lowestPrice =
@@ -229,14 +237,13 @@ async function ProductDetail({ sku }) {
             </dl>
 
             {/* ── Actions ──────────────────────────────────────────── */}
-            <div className="mt-6 space-y-2.5 border-t border-sand-100 pt-6">
-              <button
-                type="button"
-                disabled={batches.length === 0}
-                className="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-sand-200 disabled:text-sand-400"
-              >
-                {batches.length === 0 ? "Out of stock" : "Add to basket"}
-              </button>
+            <div className="mt-6 space-y-4 border-t border-sand-100 pt-6">
+              <ProductPurchasePanel
+                batches={batches}
+                unit={product.defaultUnit}
+                isSignedIn={isSignedIn}
+              />
+
               <button
                 type="button"
                 className="w-full rounded-lg border border-sand-200 bg-white px-4 py-2.5 text-sm font-semibold text-sand-700 transition hover:bg-sand-50"

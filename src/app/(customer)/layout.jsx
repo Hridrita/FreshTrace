@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Leaf, ShoppingBasket, User } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
+import { getCartCount } from "@/lib/cart";
 import LogoutButton from "@/components/LogoutButton";
 
 /**
@@ -28,6 +29,11 @@ export default async function CustomerLayout({ children }) {
   // signed-in Navbar. Treat a suspended user as signed out.
   const user = session?.user && session.user.status !== "suspended" ? session.user : null;
 
+  // The cart badge counts the lines in the customer's basket. A signed-out
+  // visitor has no cart, so the counter is hidden. The count is read-only —
+  // rendering a page must not create a cart row.
+  const cartCount = await getCartCount(user?.id);
+
   return (
     <div className="flex min-h-screen flex-col bg-sand-50">
       {/* ── Header ──────────────────────────────────────────────────── */}
@@ -54,6 +60,15 @@ export default async function CustomerLayout({ children }) {
               Catalogue
             </Link>
 
+            {user ? (
+              <Link
+                href="/app/orders"
+                className="rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+              >
+                Orders
+              </Link>
+            ) : null}
+
             {/* ── Not-yet-built destinations ───────────────────────────
                 These pages belong to later stories. They are rendered as
                 non-interactive spans rather than links: a disabled-looking
@@ -65,22 +80,26 @@ export default async function CustomerLayout({ children }) {
             >
               Subscriptions
             </span>
-            <span
-              aria-disabled="true"
-              className="cursor-not-allowed rounded-lg px-3 py-2 text-sand-400 opacity-60"
-            >
-              Orders
-            </span>
           </nav>
 
           <div className="ml-auto flex items-center gap-1.5">
-            <span
-              aria-disabled="true"
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-400 opacity-60"
-            >
-              <ShoppingBasket className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Cart</span>
-            </span>
+            {user ? (
+              <Link
+                href="/app/cart"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900"
+              >
+                <span className="relative">
+                  <ShoppingBasket className="size-4" aria-hidden="true" />
+                  {cartCount > 0 ? (
+                    <span className="absolute -right-2 -top-1.5 flex min-w-4 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-semibold leading-4 text-white">
+                      {cartCount}
+                    </span>
+                  ) : null}
+                </span>
+                <span className="hidden sm:inline">Cart</span>
+              </Link>
+            ) : null}
+
             <span
               aria-disabled="true"
               className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-400 opacity-60"

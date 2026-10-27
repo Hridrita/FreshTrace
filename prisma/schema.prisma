@@ -50,6 +50,7 @@ model User {
   sessions        Session[]
   addresses       Address[]
   orders          Order[]
+  cart            Cart?
   subscriptions   Subscription[]
   batches         Batch[]        @relation("AggregatorBatches")
   qcLogs          BatchQcLog[]
@@ -123,8 +124,9 @@ model Batch {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
-  qcLogs BatchQcLog[]
-  items  OrderItem[]
+  qcLogs    BatchQcLog[]
+  items     OrderItem[]
+  cartItems CartItem[]
 
   @@index([status, expiresAt])
   @@index([aggregatorId, status])
@@ -210,6 +212,48 @@ model Address {
   subscriptions Subscription[]
 
   @@index([userId, isDefault])
+}
+
+// ─── Cart ───────────────────────────────────────────────────────────────────
+
+/// A customer's shopping cart. One per customer — the `userId` is unique.
+///
+/// The cart is a *shopping* construct, not a business record: it holds no
+/// money and no stock reservation. It is the staging area the customer
+/// assembles an order from, and it is emptied when the order is placed.
+/// A cart that is deleted with its user is therefore safe to cascade.
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items CartItem[]
+
+  @@index([userId])
+}
+
+/// One line in a cart — a batch the customer intends to buy, at a quantity.
+///
+/// `qty` is a `Float` because kilogram weights are fractional. The unit price
+/// is *not* stored: it is always recomputed from the batch's freshness tier
+/// at read time, so a cart line can never quote a stale price (SRS §5.4 —
+/// the decay price is recomputed on every read).
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  batchId   String
+  batch     Batch    @relation(fields: [batchId], references: [id])
+  qty       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// A batch can appear at most once per cart — adding it again increases
+  /// the existing line rather than creating a second one.
+  @@unique([cartId, batchId])
+  @@index([cartId])
 }
 
 // ─── Orders & fulfilment ────────────────────────────────────────────────────

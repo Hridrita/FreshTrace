@@ -85,21 +85,25 @@ describe("customer Navbar — signed out", () => {
     expect(has(html, "Log out")).toBe(false);
   });
 
-  it("renders the four unbuilt destinations as non-interactive spans", async () => {
+  it("renders the unbuilt destinations as non-interactive spans", async () => {
     const html = await render();
 
     // A disabled-looking `<a href>` still lets keyboard and screen-reader
     // users activate a 404, so they must not be links at all.
-    for (const dead of [
-      "/app/subscriptions",
-      "/app/orders",
-      "/app/cart",
-      "/app/account",
-    ]) {
+    //
+    // Cart and Orders became real pages in the shopping-cart story, so only
+    // Subscriptions and Account remain unbuilt.
+    for (const dead of ["/app/subscriptions", "/app/account"]) {
       expect(has(html, `href="${dead}"`)).toBe(false);
     }
 
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("does not show the cart badge to a signed-out visitor", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/cart"')).toBe(false);
   });
 
   it("keeps the catalogue link live", async () => {
@@ -131,6 +135,13 @@ describe("customer Navbar — signed in", () => {
     expect(has(html, "Log out")).toBe(true);
     expect(has(html, 'href="/login"')).toBe(false);
     expect(has(html, 'href="/register"')).toBe(false);
+  });
+
+  it("links to the cart and the order history", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/cart"')).toBe(true);
+    expect(has(html, 'href="/app/orders"')).toBe(true);
   });
 });
 

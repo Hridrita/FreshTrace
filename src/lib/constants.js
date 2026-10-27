@@ -70,7 +70,28 @@ export const PAYMENT_STATUSES = /** @type {const} */ ([
   "partially_refunded",
 ]);
 
-export const PAYMENT_METHODS = /** @type {const} */ (["card", "bkash", "nagad"]);
+/**
+ * Payment methods offered at checkout.
+ *
+ * `cash_on_delivery` leads the list because it is how most Dhaka households
+ * actually buy produce from a local hub. The card and mobile-wallet options
+ * become live when the mock Stripe checkout lands.
+ */
+export const PAYMENT_METHODS = /** @type {const} */ ([
+  "cash_on_delivery",
+  "card",
+  "bkash",
+  "nagad",
+]);
+
+/**
+ * Flat delivery fee in BDT.
+ *
+ * There is one delivery fee per order in v1 — no distance banding, no
+ * free-delivery threshold. The cart quotes it and the order charges it, so
+ * it is declared once here and both paths read the same number.
+ */
+export const DELIVERY_FEE = 60;
 
 // ─── Subscriptions ──────────────────────────────────────────────────────────
 

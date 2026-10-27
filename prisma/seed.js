@@ -276,6 +276,8 @@ async function clearAll() {
   await prisma.delivery.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.subscriptionPlan.deleteMany();
   await prisma.batchQcLog.deleteMany();
