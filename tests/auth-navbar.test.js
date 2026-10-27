@@ -1,6 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterAll } from "vitest";
 import { prerender } from "react-dom/static";
 import { createElement } from "react";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Navbar session-state tests.
@@ -85,19 +86,20 @@ describe("customer Navbar — signed out", () => {
     expect(has(html, "Log out")).toBe(false);
   });
 
-  it("renders the unbuilt destinations as non-interactive spans", async () => {
+  it("links to the account page", async () => {
     const html = await render();
 
-    // A disabled-looking `<a href>` still lets keyboard and screen-reader
-    // users activate a 404, so they must not be links at all.
-    //
-    // Cart and Orders became real pages in the shopping-cart story, so only
-    // Subscriptions and Account remain unbuilt.
-    for (const dead of ["/app/subscriptions", "/app/account"]) {
-      expect(has(html, `href="${dead}"`)).toBe(false);
-    }
+    // Cart, Orders, Subscriptions and Account are all real pages now, so
+    // there is no unbuilt destination left in the header.
+    expect(has(html, 'href="/app/account"')).toBe(true);
 
-    expect((html.match(/aria-disabled="true"/g) ?? []).length).toBeGreaterThanOrEqual(2);
+    expect(has(html, 'aria-disabled="true"')).toBe(false);
+  });
+
+  it("does not show the subscriptions link to a signed-out visitor", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/subscriptions"')).toBe(false);
   });
 
   it("does not show the cart badge to a signed-out visitor", async () => {
@@ -143,6 +145,24 @@ describe("customer Navbar — signed in", () => {
     expect(has(html, 'href="/app/cart"')).toBe(true);
     expect(has(html, 'href="/app/orders"')).toBe(true);
   });
+
+  it("links to the subscriptions page", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/subscriptions"')).toBe(true);
+  });
+
+  it("links to the account page", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/account"')).toBe(true);
+  });
+
+  it("does not mark the subscriptions link as active without a plan", async () => {
+    const html = await render();
+
+    expect(has(html, "You have an active subscription")).toBe(false);
+  });
 });
 
 describe("customer Navbar — suspended user", () => {
@@ -166,5 +186,103 @@ describe("customer Navbar — suspended user", () => {
 
     expect(has(html, 'href="/login"')).toBe(true);
     expect(has(html, "Log out")).toBe(false);
+  });
+});
+
+describe("customer Navbar — active subscription marker", () => {
+  let subscriber;
+  let plan;
+  let address;
+
+  beforeEach(async () => {
+    subscriber = await prisma.user.create({
+      data: {
+        email: `navbar.subscriber.${Date.now()}@test.local`,
+        passwordHash: "x",
+        name: "Plan Subscriber",
+        role: "customer",
+      },
+    });
+
+    plan = await prisma.subscriptionPlan.findFirst({
+      where: { isActive: true },
+    });
+
+    // The test database is migrated but not seeded, so there may be no plan
+    // to subscribe to.
+    if (!plan) {
+      plan = await prisma.subscriptionPlan.create({
+        data: {
+          name: "Navbar Test Plan",
+          basketSize: "small",
+          weeklyPrice: 650,
+          composition: "[]",
+          isActive: true,
+        },
+      });
+    }
+
+    address = await prisma.address.create({
+      data: {
+        userId: subscriber.id,
+        label: "Home",
+        line1: "House 10, Road 5",
+        area: "Gulshan-2",
+        city: "Dhaka",
+        isDefault: true,
+      },
+    });
+
+    sessionState.session = {
+      id: "session-1",
+      user: {
+        id: subscriber.id,
+        name: subscriber.name,
+        email: subscriber.email,
+        role: "customer",
+        status: "active",
+      },
+    };
+  });
+
+  afterAll(async () => {
+    await prisma.subscription.deleteMany({ where: { customerId: subscriber.id } });
+    await prisma.address.deleteMany({ where: { userId: subscriber.id } });
+    await prisma.user.deleteMany({ where: { id: subscriber.id } });
+  });
+
+  it("marks the subscriptions link when the customer has an active plan", async () => {
+    await prisma.subscription.create({
+      data: {
+        customerId: subscriber.id,
+        planId: plan.id,
+        addressId: address.id,
+        dayOfWeek: 5,
+        status: "active",
+        nextDeliveryAt: new Date(Date.now() + 3 * 86_400_000),
+      },
+    });
+
+    const html = await render();
+
+    expect(has(html, "You have an active subscription")).toBe(true);
+  });
+
+  it("does not mark the subscriptions link for a paused plan", async () => {
+    await prisma.subscription.create({
+      data: {
+        customerId: subscriber.id,
+        planId: plan.id,
+        addressId: address.id,
+        dayOfWeek: 5,
+        status: "paused",
+        pauseUntil: new Date(Date.now() + 7 * 86_400_000),
+        nextDeliveryAt: new Date(Date.now() + 3 * 86_400_000),
+      },
+    });
+
+    const html = await render();
+
+    expect(has(html, "You have an active subscription")).toBe(false);
   });
 });

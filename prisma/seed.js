@@ -152,27 +152,64 @@ const CUSTOMERS = [
   { email: "customer.arif@freshtrace.test", name: "Arif Hossain", phone: "+8801900000005" },
 ];
 
+/**
+ * The subscription plans on offer.
+ *
+ * `composition` is a list of product SKUs with the default quantity of each
+ * in the basket. The basket size decides how many SKUs a plan carries and
+ * how much of each (SRS §4.7): small ~3 kg over 5–6 SKUs, medium ~4–5 kg
+ * over 6–8 SKUs, large ~5–6 kg over 7–9 SKUs.
+ *
+ * `weeklyPrice` is the *fresh-tier* price — a ceiling, not a fixed charge.
+ * A renewal is priced from the actual freshness tier of each item on the
+ * delivery day, so the real bill may come out lower.
+ */
 const PLANS = [
   {
     name: "Couple Weekly",
     basketSize: "small",
     weeklyPrice: 650,
     description: "A small weekly basket of seasonal fruit and vegetables.",
-    composition: [],
+    composition: [
+      { sku: "FR-MNG-HIMKOPA", defaultQty: 1.5 },
+      { sku: "FR-ORG-CALAMANSI", defaultQty: 0.5 },
+      { sku: "FR-VEG-EGG", defaultQty: 0.5 },
+      { sku: "FR-VEG-TOMATO", defaultQty: 0.5 },
+      { sku: "FR-HER-CORIANDER", defaultQty: 1 },
+    ],
   },
   {
     name: "Family Weekly",
     basketSize: "medium",
     weeklyPrice: 1200,
     description: "A medium basket covering everyday household cooking.",
-    composition: [],
+    composition: [
+      { sku: "FR-MNG-HIMKOPA", defaultQty: 2 },
+      { sku: "FR-ORG-JUMBO", defaultQty: 3 },
+      { sku: "FR-VEG-EGG", defaultQty: 1 },
+      { sku: "FR-VEG-TOMATO", defaultQty: 1 },
+      { sku: "FR-VEG-OKRA", defaultQty: 0.5 },
+      { sku: "FR-VEG-GOURD", defaultQty: 1 },
+      { sku: "FR-HER-CORIANDER", defaultQty: 1 },
+    ],
   },
   {
     name: "Family Premium",
     basketSize: "large",
     weeklyPrice: 1850,
     description: "A large basket with premium fruit and a wider vegetable mix.",
-    composition: [],
+    composition: [
+      { sku: "FR-MNG-ALPHONSO", defaultQty: 1 },
+      { sku: "FR-MNG-HIMKOPA", defaultQty: 2 },
+      { sku: "FR-ORG-JUMBO", defaultQty: 4 },
+      { sku: "FR-ORG-CALAMANSI", defaultQty: 0.5 },
+      { sku: "FR-VEG-EGG", defaultQty: 1.5 },
+      { sku: "FR-VEG-TOMATO", defaultQty: 1.5 },
+      { sku: "FR-VEG-OKRA", defaultQty: 0.75 },
+      { sku: "FR-VEG-GOURD", defaultQty: 2 },
+      { sku: "FR-HER-CORIANDER", defaultQty: 1 },
+      { sku: "FR-HER-MINT", defaultQty: 1 },
+    ],
   },
 ];
 
@@ -388,19 +425,32 @@ async function main() {
   console.log(`   ✓ products         ${products.length} created`);
 
   // ── Subscription plans ───────────────────────────────────────────────────
+  // The plan's composition is written in SKUs, because SKUs are stable and
+  // human-readable in the seed file. The stored column holds product ids.
+  const productIdBySku = new Map(products.map((p) => [p.sku, p.id]));
+
   const plans = [];
   for (const plan of PLANS) {
+    const composition = plan.composition
+      .filter((item) => productIdBySku.has(item.sku))
+      .map((item) => ({
+        productId: productIdBySku.get(item.sku),
+        defaultQty: item.defaultQty,
+      }));
+
+    if (composition.length === 0) {
+      throw new Error(
+        `Subscription plan "${plan.name}" has no resolvable products in its composition.`,
+      );
+    }
+
     const created = await prisma.subscriptionPlan.create({
       data: {
         name: plan.name,
         basketSize: plan.basketSize,
         weeklyPrice: plan.weeklyPrice,
         description: plan.description,
-        composition: JSON.stringify(
-          plan.composition.length > 0
-            ? plan.composition
-            : products.slice(0, 4).map((p) => ({ productId: p.id, defaultQty: 1 })),
-        ),
+        composition: JSON.stringify(composition),
         isActive: true,
       },
     });

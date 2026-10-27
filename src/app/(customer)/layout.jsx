@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Leaf, ShoppingBasket, User } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getCartCount } from "@/lib/cart";
+import { hasActiveSubscription } from "@/lib/subscriptions-read";
 import LogoutButton from "@/components/LogoutButton";
 
 /**
@@ -34,6 +35,11 @@ export default async function CustomerLayout({ children }) {
   // rendering a page must not create a cart row.
   const cartCount = await getCartCount(user?.id);
 
+  // The Subscriptions link is marked with a dot when the customer has a
+  // live plan, so the recurring delivery is visible from any page. Only
+  // an `active` plan counts — a paused one is not delivering anything.
+  const hasActivePlan = await hasActiveSubscription(user?.id);
+
   return (
     <div className="flex min-h-screen flex-col bg-sand-50">
       {/* ── Header ──────────────────────────────────────────────────── */}
@@ -61,12 +67,32 @@ export default async function CustomerLayout({ children }) {
             </Link>
 
             {user ? (
-              <Link
-                href="/app/orders"
-                className="rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
-              >
-                Orders
-              </Link>
+              <>
+                <Link
+                  href="/app/orders"
+                  className="rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                >
+                  Orders
+                </Link>
+
+                {/* The Subscriptions link carries a dot when the customer
+                    has a live plan, so the recurring delivery is visible
+                    from any page without opening the page itself. */}
+                <Link
+                  href="/app/subscriptions"
+                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                >
+                  Subscriptions
+                  {hasActivePlan ? (
+                    <span
+                      className="size-1.5 rounded-full bg-fresh-500"
+                      title="You have an active subscription"
+                      aria-label="You have an active subscription"
+                      role="img"
+                    />
+                  ) : null}
+                </Link>
+              </>
             ) : null}
 
             {/* ── Not-yet-built destinations ───────────────────────────
@@ -74,12 +100,6 @@ export default async function CustomerLayout({ children }) {
                 non-interactive spans rather than links: a disabled-looking
                 `<a href>` still lets keyboard and screen-reader users
                 activate a 404. */}
-            <span
-              aria-disabled="true"
-              className="cursor-not-allowed rounded-lg px-3 py-2 text-sand-400 opacity-60"
-            >
-              Subscriptions
-            </span>
           </nav>
 
           <div className="ml-auto flex items-center gap-1.5">
@@ -100,13 +120,13 @@ export default async function CustomerLayout({ children }) {
               </Link>
             ) : null}
 
-            <span
-              aria-disabled="true"
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-400 opacity-60"
+            <Link
+              href="/app/account"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900"
             >
               <User className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Account</span>
-            </span>
+            </Link>
 
             {/* ── SessionUser slot ─────────────────────────────────────
                 Signed out: Login + Register. Signed in: the user's name

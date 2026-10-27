@@ -175,7 +175,7 @@ model Subscription {
   planId         String
   plan           SubscriptionPlan @relation(fields: [planId], references: [id])
   addressId      String
-  address        Address          @relation(fields: [addressId], references: [id])
+  address        Address          @relation(fields: [addressId], references: [id], onDelete: Cascade)
   dayOfWeek      Int // 0 = Sunday, 6 = Saturday
   status         String           @default("active") // active | paused | ended
   nextDeliveryAt DateTime

@@ -6,6 +6,7 @@ import FreshnessBadge from "@/components/FreshnessBadge";
 import ProductPurchasePanel from "@/components/ProductPurchasePanel";
 import { getSession } from "@/lib/auth/session";
 import { getAvailableBatches, getProductBySku } from "@/lib/catalog";
+import { hasActiveSubscription } from "@/lib/subscriptions-read";
 import {
   formatBDT,
   formatUnit,
@@ -62,6 +63,15 @@ async function ProductDetail({ sku }) {
   // signed out, matching the customer shell's header.
   const session = await getSession();
   const isSignedIn = Boolean(session?.user && session.user.status !== "suspended");
+
+  // A customer who is already on a weekly basket is offered their
+  // subscription rather than a way to start another one. The subscription
+  // basket is fixed by the plan in v1 (SRS §1 — "fixed plans only in v1"), so
+  // there is nothing to add this product to; the button takes the customer
+  // to where the basket is chosen and managed.
+  const hasActivePlan = isSignedIn
+    ? await hasActiveSubscription(session.user.id)
+    : false;
 
   // The cheapest batch currently on offer is the headline price.
   const lowestPrice =
@@ -244,12 +254,16 @@ async function ProductDetail({ sku }) {
                 isSignedIn={isSignedIn}
               />
 
-              <button
-                type="button"
-                className="w-full rounded-lg border border-sand-200 bg-white px-4 py-2.5 text-sm font-semibold text-sand-700 transition hover:bg-sand-50"
+              {/* The weekly basket is chosen as a whole plan, so this takes
+                  the customer to the subscription page rather than adding
+                  this one product to a basket that does not exist yet
+                  (SRS §1 — "fixed plans only in v1"). */}
+              <Link
+                href="/app/subscriptions"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-sand-200 bg-white px-4 py-2.5 text-sm font-semibold text-sand-700 transition hover:bg-sand-50"
               >
-                Add to weekly subscription
-              </button>
+                {hasActivePlan ? "View my weekly subscription" : "Start a weekly subscription"}
+              </Link>
             </div>
 
             <p className="mt-4 text-xs leading-relaxed text-sand-400">
