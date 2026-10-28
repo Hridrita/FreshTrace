@@ -39,6 +39,70 @@ let admin;
 let aggregator;
 let product;
 
+/**
+ * The addresses this file is responsible for.
+ *
+ * @type {string[]}
+ */
+const OWNED_EMAILS = ["admin.products@test.local", "agg.products@test.local"];
+
+/**
+ * The product SKUs this file creates.
+ *
+ * @type {string[]}
+ */
+const OWNED_SKUS = ["FR-TEST-MANGO", "FR-TEST-TOMATO"];
+
+/**
+ * Remove the rows this file created.
+ *
+ * The deletes are scoped to this file's own rows. The test files share one
+ * SQLite database, so a blanket `deleteMany()` would pull rows out from
+ * under a file that is still running — and a blanket `user.deleteMany()`
+ * fails outright with `P2003` ("Foreign key constraint violated") whenever
+ * another file's batches, QC logs, orders or refunds still point at their
+ * users, because those foreign keys do not cascade.
+ *
+ * @returns {Promise<void>}
+ */
+async function cleanUp() {
+  // The children first, in dependency order.
+  await prisma.orderItem.deleteMany({
+    where: { batch: { product: { sku: { in: OWNED_SKUS } } } },
+  });
+  await prisma.cartItem.deleteMany({
+    where: { batch: { product: { sku: { in: OWNED_SKUS } } } },
+  });
+  await prisma.batchQcLog.deleteMany({
+    where: { batch: { product: { sku: { in: OWNED_SKUS } } } },
+  });
+  await prisma.batch.deleteMany({
+    where: { product: { sku: { in: OWNED_SKUS } } },
+  });
+  await prisma.product.deleteMany({ where: { sku: { in: OWNED_SKUS } } });
+
+  await prisma.session.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.adminSession.deleteMany({
+    where: { operator: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.cart.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.subscription.deleteMany({
+    where: { customer: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.address.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
+  });
+
+  // Only now is it safe to remove the users themselves.
+  await prisma.user.deleteMany({
+    where: { email: { in: OWNED_EMAILS } },
+  });
+}
+
 beforeAll(async () => {
   admin = await prisma.user.create({
     data: {
@@ -62,23 +126,12 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.batchQcLog.deleteMany();
-  await prisma.batch.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.address.deleteMany();
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanUp();
   await prisma.$disconnect();
 });
 
 beforeEach(async () => {
-  await prisma.batch.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.user.deleteMany({
-    where: { email: { in: ["admin.products@test.local", "agg.products@test.local"] } },
-  });
+  await cleanUp();
 
   admin = await prisma.user.create({
     data: { email: "admin.products@test.local", passwordHash: "x", name: "Admin", role: "admin" },

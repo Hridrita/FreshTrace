@@ -1,26 +1,31 @@
 // FreshTrace — Lean v1 data model
 //
-// Stack: Next.js (App Router, JS) + Prisma + SQLite
+// Stack: Next.js (App Router, JS) + Prisma + PostgreSQL
 // Source of truth: SRS.md §4
 //
 // Conventions
 // - cuid() string primary keys.
 // - Money is integer BDT (Int). Never Float.
 // - Quantities are Float (kg can be fractional).
-// - Enum-like fields are String + app-level allowlist (SQLite has no enums).
+// - Enum-like fields are String + app-level allowlist.
 // - harvestDate / date fields are calendar dates (midnight Asia/Dhaka).
 // - Referential actions are declared explicitly, never left implicit.
 //   Dependent child rows use Cascade (Session, Address, BatchQcLog,
 //   OrderItem, RefundItem). Business records keep Restrict (Order, Refund,
 //   Payment, Delivery), so a paid order cannot lose its payment or refund
 //   history by being deleted out from under them.
+//
+// The test suite runs against a throwaway SQLite database, derived from this
+// schema by `scripts/make-test-schema.mjs` and pushed with `db push`. The
+// application itself runs on PostgreSQL (Neon), and `prisma/migrations`
+// holds the PostgreSQL migration history.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -111,7 +116,18 @@ model Product {
   name               String
   category           String // fruit | vegetable | other
   defaultUnit        String   @default("kg") // kg | piece | bunch
-  baseUnitPrice      Int // BDT
+  baseUnitPrice      Int // BDT, retail price before any freshness discount
+  /// The aggregator's wholesale cost per unit, in BDT. FreshTrace buys at
+  /// this price and sells at `baseUnitPrice` (adjusted by the freshness
+  /// tier), so the spread between the two is the platform's gross margin.
+  ///
+  /// This is the *cost of goods*, and it is deliberately a separate field
+  /// from `baseUnitPrice`: charging the retail price as the cost would make
+  /// every sale margin-free and every discounted sale a loss. It is
+  /// nullable so the catalogue can list a product before its aggregator
+  /// has quoted a cost; the margin metric treats a missing cost as zero
+  /// rather than guessing one.
+  costUnitPrice      Int?
   imageUrl           String?
   description        String?
   originDistrict     String?

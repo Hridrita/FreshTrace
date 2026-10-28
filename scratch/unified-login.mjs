@@ -49,7 +49,7 @@ async function signIn(context, email, password) {
 // ── 2. The operations operator, same page ──────────────────────────
 {
   const ctx = await browser.newContext();
-  const url = await signIn(ctx, "admin@freshtrace.com", "AdminPassword123!");
+  const url = await signIn(ctx, "admin@freshtrace.com", "FreshTrace!2026");
   console.log(`operator → ${new URL(url).pathname}`);
   console.log(`  landed on the admin panel: ${new URL(url).pathname === "/app/admin"}`);
 

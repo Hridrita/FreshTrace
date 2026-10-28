@@ -24,10 +24,11 @@ import { hashPassword } from "@/lib/auth/password";
  * sign-in (`POST /api/auth/login`), which opens the admin session instead of
  * a customer session when the credential matches.
  *
- * The credentials are **fixed** by the story: `admin@freshtrace.com` /
- * `AdminPassword123!`, overridable through the `ADMIN_EMAIL` and
+ * The credentials are **fixed** by the story: `admin@freshtrace.com` with
+ * the default password, overridable through the `ADMIN_EMAIL` and
  * `ADMIN_PASSWORD` environment variables so a deployment can rotate them
- * without a code change.
+ * without a code change. The default matches the password
+ * `prisma/seed.js` writes for the seeded operator.
  *
  * This is a deliberate v1 trade-off — the panel is internal, single-tenant
  * and operated by the FreshTrace team, so a single fixed operator account is
@@ -53,9 +54,14 @@ export const DEFAULT_ADMIN_EMAIL = "admin@freshtrace.com";
 /**
  * The default admin password, used when `ADMIN_PASSWORD` is unset.
  *
+ * This matches the credential `prisma/seed.js` writes for the seeded
+ * operator, so a freshly seeded database can be signed into — with no
+ * `.env` configuration — and lands on the operations panel rather than
+ * the customer catalogue.
+ *
  * @type {string}
  */
-export const DEFAULT_ADMIN_PASSWORD = "AdminPassword123!";
+export const DEFAULT_ADMIN_PASSWORD = "FreshTrace!2026";
 
 /**
  * The configured admin email.

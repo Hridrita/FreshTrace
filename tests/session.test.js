@@ -35,8 +35,11 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany();
+  // Scoped to this file's own rows: the test files share one SQLite
+  // database, and a blanket `deleteMany` would fail on the foreign keys
+  // belonging to rows another file created.
+  await prisma.session.deleteMany({ where: { userId: user.id } });
+  await prisma.user.deleteMany({ where: { id: user.id } });
   await prisma.$disconnect();
 });
 

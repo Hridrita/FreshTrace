@@ -59,7 +59,7 @@ const context = await browser.newContext({
 const login = await context.newPage();
 await login.goto(`${BASE}/login`, { waitUntil: "networkidle" });
 await login.fill('input[name="email"]', "admin@freshtrace.com");
-await login.fill('input[name="password"]', "AdminPassword123!");
+await login.fill('input[name="password"]', "FreshTrace!2026");
 await login.click('button[type="submit"]');
 await login.waitForURL(/\/app\/admin(\/|$)/, { timeout: 15000 });
 console.log("signed in");

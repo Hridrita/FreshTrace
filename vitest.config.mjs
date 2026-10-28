@@ -13,6 +13,10 @@ export default defineConfig({
     // with each other or they will collide on the same rows.
     fileParallelism: false,
     include: ["tests/**/*.test.js"],
+    // Prepares the SQLite test database and its Prisma client, once, before
+    // any worker starts. See `tests/global-setup.js` for why this cannot
+    // live in `setupFiles`, which runs in every worker.
+    globalSetup: ["tests/global-setup.js"],
     setupFiles: ["tests/setup.js"],
     testTimeout: 20000,
     hookTimeout: 30000,
