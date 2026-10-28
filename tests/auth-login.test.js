@@ -2,6 +2,11 @@ import { describe, it, expect, beforeEach, afterAll, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth/password";
 import { SESSION_COOKIE_NAME } from "@/lib/auth/session";
+import {
+  ADMIN_SESSION_COOKIE_NAME,
+  DEFAULT_ADMIN_EMAIL,
+  DEFAULT_ADMIN_PASSWORD,
+} from "@/lib/admin/auth";
 
 /**
  * Integration tests for `POST /api/auth/login` and `POST /api/auth/logout`.
@@ -149,6 +154,119 @@ describe("POST /api/auth/login", () => {
 
     expect(await prisma.session.count({ where: { userId: user.id } })).toBe(1);
     expect(cookie).toContain(`${SESSION_COOKIE_NAME}=`);
+  });
+});
+
+describe("POST /api/auth/login — operations operator", () => {
+  beforeEach(async () => {
+    await prisma.adminSession.deleteMany();
+  });
+
+  afterAll(async () => {
+    await prisma.adminSession.deleteMany();
+  });
+
+  it("opens an admin session for the operations credential", async () => {
+    const response = await login(
+      jsonRequest({
+        email: DEFAULT_ADMIN_EMAIL,
+        password: DEFAULT_ADMIN_PASSWORD,
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(body.data.kind).toBe("admin");
+    expect(body.data.role).toBe("admin");
+    expect(body.data.redirectTo).toBe("/app/admin");
+    expect(body.error).toBeUndefined();
+
+    const setCookie = response.headers.get("set-cookie") ?? "";
+    expect(setCookie).toContain(`${ADMIN_SESSION_COOKIE_NAME}=`);
+    expect(setCookie).toContain("HttpOnly");
+    expect(/SameSite=lax/i.test(setCookie)).toBe(true);
+  });
+
+  it("does not open a customer session for the operations credential", async () => {
+    const response = await login(
+      jsonRequest({
+        email: DEFAULT_ADMIN_EMAIL,
+        password: DEFAULT_ADMIN_PASSWORD,
+      }),
+    );
+
+    // The two cookies are independent. The operator's customer session must
+    // not be created as a side effect of the panel sign-in.
+    expect(response.headers.get("set-cookie") ?? "").not.toContain(
+      `${SESSION_COOKIE_NAME}=`,
+    );
+    expect(await prisma.session.count()).toBe(0);
+  });
+
+  it("records the admin session against the operations operator", async () => {
+    await login(
+      jsonRequest({
+        email: DEFAULT_ADMIN_EMAIL,
+        password: DEFAULT_ADMIN_PASSWORD,
+      }),
+    );
+
+    const sessions = await prisma.adminSession.findMany({
+      include: { operator: true },
+    });
+
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].operator.email).toBe(DEFAULT_ADMIN_EMAIL);
+    expect(sessions[0].operator.role).toBe("admin");
+    expect(sessions[0].operator.status).toBe("active");
+  });
+
+  it("rejects a wrong operations password with 401 and sets no cookie", async () => {
+    const response = await login(
+      jsonRequest({
+        email: DEFAULT_ADMIN_EMAIL,
+        password: "not-the-password",
+      }),
+    );
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error.code).toBe("unauthenticated");
+    expect(response.headers.get("set-cookie") ?? "").not.toContain(
+      `${ADMIN_SESSION_COOKIE_NAME}=`,
+    );
+    expect(await prisma.adminSession.count()).toBe(0);
+  });
+
+  it("rejects a wrong operations email with the same message as a wrong password", async () => {
+    const unknown = await login(
+      jsonRequest({ email: "ops@nowhere.test", password: DEFAULT_ADMIN_PASSWORD }),
+    );
+    const unknownBody = await unknown.json();
+
+    const wrong = await login(
+      jsonRequest({ email: DEFAULT_ADMIN_EMAIL, password: "not-the-password" }),
+    );
+    const wrongBody = await wrong.json();
+
+    // The form must not be usable to discover the operator's address.
+    expect(unknownBody.error.message).toBe(wrongBody.error.message);
+    expect(unknownBody.error.code).toBe(wrongBody.error.code);
+  });
+
+  it("ignores a non-string password without throwing", async () => {
+    const response = await login(
+      jsonRequest({ email: DEFAULT_ADMIN_EMAIL, password: 12345 }),
+    );
+
+    // A non-string password fails the shape check before any credential
+    // comparison happens. The important part is that it does not throw and
+    // does not open a session.
+    expect(response.status).toBe(422);
+    expect(response.headers.get("set-cookie") ?? "").not.toContain(
+      `${ADMIN_SESSION_COOKIE_NAME}=`,
+    );
+    expect(await prisma.adminSession.count()).toBe(0);
   });
 });
 

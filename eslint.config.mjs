@@ -10,6 +10,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // A scratch dist dir (`NEXT_DIST_DIR=.next-build next build`) is used to
+    // sidestep OneDrive file locks on `.next`. It is build output, not source.
+    ".next-*/**",
+    // Coverage report assets are generated, not authored.
+    "coverage/**",
   ]),
 ]);
 

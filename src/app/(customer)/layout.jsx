@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Leaf, ShoppingBasket, User } from "lucide-react";
+import { Leaf, LayoutDashboard, ShoppingBasket, User } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getCartCount } from "@/lib/cart";
 import { hasActiveSubscription } from "@/lib/subscriptions-read";
@@ -39,6 +39,14 @@ export default async function CustomerLayout({ children }) {
   // live plan, so the recurring delivery is visible from any page. Only
   // an `active` plan counts — a paused one is not delivering anything.
   const hasActivePlan = await hasActiveSubscription(user?.id);
+
+  // The Admin Dashboard link is shown only to accounts with the `admin`
+  // role. The operations panel is gated on its own dedicated admin session
+  // (the `ft_admin_session` cookie), so a signed-in customer *without* that
+  // cookie would still be bounced to the sign-in page. Hiding the link from
+  // non-operators keeps the storefront honest about who can use the panel,
+  // while the panel's own guard remains the real enforcement.
+  const isAdmin = user?.role === "admin";
 
   return (
     <div className="flex min-h-screen flex-col bg-sand-50">
@@ -92,6 +100,21 @@ export default async function CustomerLayout({ children }) {
                     />
                   ) : null}
                 </Link>
+
+                {/* The Admin Dashboard link is for FreshTrace staff only. The
+                    link is rendered server-side, gated on the account role,
+                    so a non-operator never sees it in the markup. Clicking
+                    it while signed out of the panel still lands on the admin
+                    sign-in page — the panel's own guard handles that. */}
+                {isAdmin ? (
+                  <Link
+                    href="/app/admin"
+                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                  >
+                    <LayoutDashboard className="size-4" aria-hidden="true" />
+                    Admin Dashboard
+                  </Link>
+                ) : null}
               </>
             ) : null}
 
