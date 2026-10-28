@@ -61,16 +61,94 @@ const REGISTERED_EMAIL = "register.test@test.local";
  */
 const OTHER_EMAIL = "alice@example.com";
 
-beforeEach(async () => {
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany({
-    where: { email: { in: [REGISTERED_EMAIL, OTHER_EMAIL] } },
+/**
+ * The addresses this file is responsible for.
+ *
+ * Both are deleted explicitly, with their dependent rows, in `beforeEach`
+ * and `afterAll`. Nothing outside this file may touch them.
+ *
+ * @type {string[]}
+ */
+const OWNED_EMAILS = [REGISTERED_EMAIL, OTHER_EMAIL];
+
+/**
+ * Remove the rows this file created.
+ *
+ * The order matters. `User` is referenced by several models whose foreign
+ * keys do **not** cascade — `Batch.aggregatorId`, `BatchQcLog.inspectorId`,
+ * `Order.customerId`, `Refund.requestedBy` and `Refund.resolvedBy` — so a
+ * `user.deleteMany()` that runs while any of those rows still point at the
+ * user fails with `P2003` ("Foreign key constraint violated").
+ *
+ * A blanket `user.deleteMany()` is doubly wrong here: the test files share
+ * one SQLite database, so it would also pull rows out from under a file
+ * that is still running. The deletes are scoped to this file's own
+ * addresses, and the children are removed first.
+ *
+ * @returns {Promise<void>}
+ */
+async function cleanUp() {
+  // Sessions cascade from `User`, but they are removed explicitly so the
+  // intent is obvious and the delete order is not left to the engine.
+  await prisma.session.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
   });
+
+  // The remaining children of a user, in dependency order. `Order` cascades
+  // to `OrderItem`, and `Batch` cascades to `BatchQcLog`, but both are
+  // deleted explicitly for the same reason as `Session`.
+  await prisma.cartItem.deleteMany({
+    where: { batch: { aggregator: { email: { in: OWNED_EMAILS } } } },
+  });
+  await prisma.orderItem.deleteMany({
+    where: { order: { customer: { email: { in: OWNED_EMAILS } } } },
+  });
+  await prisma.refundItem.deleteMany({
+    where: { refund: { order: { customer: { email: { in: OWNED_EMAILS } } } } },
+  });
+  await prisma.refund.deleteMany({
+    where: { order: { customer: { email: { in: OWNED_EMAILS } } } },
+  });
+  await prisma.payment.deleteMany({
+    where: { order: { customer: { email: { in: OWNED_EMAILS } } } },
+  });
+  await prisma.delivery.deleteMany({
+    where: { order: { customer: { email: { in: OWNED_EMAILS } } } },
+  });
+  await prisma.order.deleteMany({
+    where: { customer: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.cart.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.subscription.deleteMany({
+    where: { customer: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.address.deleteMany({
+    where: { user: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.adminSession.deleteMany({
+    where: { operator: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.batchQcLog.deleteMany({
+    where: { inspector: { email: { in: OWNED_EMAILS } } },
+  });
+  await prisma.batch.deleteMany({
+    where: { aggregator: { email: { in: OWNED_EMAILS } } },
+  });
+
+  // Only now is it safe to remove the users themselves.
+  await prisma.user.deleteMany({
+    where: { email: { in: OWNED_EMAILS } },
+  });
+}
+
+beforeEach(async () => {
+  await cleanUp();
 });
 
 afterAll(async () => {
-  await prisma.session.deleteMany();
-  await prisma.user.deleteMany();
+  await cleanUp();
   await prisma.$disconnect();
 });
 
