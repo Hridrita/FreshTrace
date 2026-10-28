@@ -19,6 +19,14 @@
 /prisma/*.db-shm
 /prisma/*.db-wal
 
+# generated Prisma clients
+# `src/generated/prisma-sqlite` is built by `tests/global-setup.js` from
+# `prisma/schema.sqlite.prisma`; `prisma/schema.sqlite.prisma` itself is
+# derived from the canonical schema by `scripts/make-test-schema.mjs`.
+/src/generated/
+/prisma/schema.sqlite.prisma
+/prisma/.prisma-client-tmp/
+
 # next.js
 /.next/
 /out/

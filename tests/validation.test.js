@@ -101,6 +101,34 @@ describe("validateProductInput", () => {
     const result = validateProductInput(null);
     expect(result.success).toBe(false);
   });
+
+  it("accepts a wholesale cost below the retail price", () => {
+    const result = validateProductInput({ ...VALID, costUnitPrice: 125 });
+    expect(result.success).toBe(true);
+    expect(result.data.costUnitPrice).toBe(125);
+  });
+
+  it("leaves the wholesale cost unset when it is not supplied", () => {
+    const result = validateProductInput(VALID);
+    expect(result.success).toBe(true);
+    expect(result.data.costUnitPrice).toBeNull();
+  });
+
+  it("rejects a wholesale cost above the retail price", () => {
+    const result = validateProductInput({ ...VALID, costUnitPrice: 221 });
+    expect(result.success).toBe(false);
+    expect(hasIssue(result.errors, "costUnitPrice")).toBe(true);
+  });
+
+  it("accepts a wholesale cost equal to the retail price", () => {
+    const result = validateProductInput({ ...VALID, costUnitPrice: 220 });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a non-positive wholesale cost", () => {
+    expect(validateProductInput({ ...VALID, costUnitPrice: 0 }).success).toBe(false);
+    expect(validateProductInput({ ...VALID, costUnitPrice: -5 }).success).toBe(false);
+  });
 });
 
 describe("validateProductUpdate", () => {
@@ -139,5 +167,17 @@ describe("validateProductUpdate", () => {
   it("does not allow the SKU to be changed", () => {
     const result = validateProductUpdate({ sku: "NEW-SKU" });
     expect(result.success).toBe(false);
+  });
+
+  it("accepts a wholesale cost", () => {
+    const result = validateProductUpdate({ costUnitPrice: 150 });
+    expect(result.success).toBe(true);
+    expect(result.data.costUnitPrice).toBe(150);
+  });
+
+  it("allows the wholesale cost to be cleared", () => {
+    const result = validateProductUpdate({ costUnitPrice: null });
+    expect(result.success).toBe(true);
+    expect(result.data.costUnitPrice).toBeNull();
   });
 });

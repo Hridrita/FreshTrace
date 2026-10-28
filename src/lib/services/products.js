@@ -92,6 +92,7 @@ export async function createProduct(input) {
       category: input.category,
       defaultUnit: input.defaultUnit,
       baseUnitPrice: input.baseUnitPrice,
+      costUnitPrice: input.costUnitPrice ?? null,
       imageUrl: input.imageUrl ?? null,
       description: input.description ?? null,
       originDistrict: input.originDistrict ?? null,
@@ -123,6 +124,24 @@ export async function updateProduct(id, patch) {
 
   if (Object.keys(data).length === 0) {
     return existing;
+  }
+
+  // The wholesale cost can never exceed the retail price, or the product
+  // would be sold at a loss by construction. The retail price may be
+  // changing in the same patch, so the comparison is made against the price
+  // the product will have *after* the update.
+  const effectiveRetailPrice = /** @type {number} */ (
+    data.baseUnitPrice ?? existing.baseUnitPrice
+  );
+  const effectiveCost = data.costUnitPrice === undefined
+    ? existing.costUnitPrice
+    : /** @type {number | null} */ (data.costUnitPrice);
+  if (effectiveCost !== null && effectiveCost !== undefined && effectiveCost > effectiveRetailPrice) {
+    throw apiError(
+      ERROR_CODES.VALIDATION_FAILED,
+      "The wholesale cost cannot be higher than the retail price.",
+      { costUnitPrice: effectiveCost, baseUnitPrice: effectiveRetailPrice },
+    );
   }
 
   return prisma.product.update({ where: { id }, data });

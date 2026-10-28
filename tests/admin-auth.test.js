@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { readFileSync } from "node:fs";
 import {
   ADMIN_SESSION_COOKIE_NAME,
   DEFAULT_ADMIN_EMAIL,
@@ -14,9 +15,12 @@ import { ADMIN_LOGIN_PATH } from "@/lib/admin/guard";
 /**
  * Admin access control.
  *
- * Story 5 fixes the operations credential to `admin@freshtrace.com` /
- * `AdminPassword123!`, overridable through `ADMIN_EMAIL` and
- * `ADMIN_PASSWORD`.
+ * The operations credential is `admin@freshtrace.com` with the default
+ * password, overridable through `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
+ *
+ * The default password is the same one `prisma/seed.js` writes for the
+ * seeded operator, so a freshly seeded database can be signed into with no
+ * environment configuration and lands on the operations panel.
  */
 
 describe("admin credential configuration", () => {
@@ -38,7 +42,19 @@ describe("admin credential configuration", () => {
     expect(getAdminEmail()).toBe(DEFAULT_ADMIN_EMAIL);
     expect(getAdminEmail()).toBe("admin@freshtrace.com");
     expect(getAdminPassword()).toBe(DEFAULT_ADMIN_PASSWORD);
-    expect(getAdminPassword()).toBe("AdminPassword123!");
+  });
+
+  it("uses the same default password the seed writes", () => {
+    // The seed and the panel must agree, or a seeded operator cannot sign
+    // in to the dashboard at all.
+    delete process.env.ADMIN_PASSWORD;
+
+    const seed = readFileSync(
+      new URL("../prisma/seed.js", import.meta.url),
+      "utf8",
+    );
+
+    expect(seed).toContain(`"${DEFAULT_ADMIN_PASSWORD}"`);
   });
 
   it("prefers the environment variables when they are set", () => {
@@ -65,11 +81,15 @@ describe("verifyAdminCredentials", () => {
   });
 
   it("accepts the fixed credential", () => {
-    expect(verifyAdminCredentials("admin@freshtrace.com", "AdminPassword123!")).toBe(true);
+    expect(
+      verifyAdminCredentials("admin@freshtrace.com", DEFAULT_ADMIN_PASSWORD),
+    ).toBe(true);
   });
 
   it("is case-insensitive on the email and trims whitespace", () => {
-    expect(verifyAdminCredentials("  ADMIN@FreshTrace.com  ", "AdminPassword123!")).toBe(true);
+    expect(
+      verifyAdminCredentials("  ADMIN@FreshTrace.com  ", DEFAULT_ADMIN_PASSWORD),
+    ).toBe(true);
   });
 
   it("rejects a wrong password", () => {
@@ -77,11 +97,13 @@ describe("verifyAdminCredentials", () => {
   });
 
   it("rejects an unknown email", () => {
-    expect(verifyAdminCredentials("someone@example.com", "AdminPassword123!")).toBe(false);
+    expect(
+      verifyAdminCredentials("someone@example.com", DEFAULT_ADMIN_PASSWORD),
+    ).toBe(false);
   });
 
   it("rejects empty and missing values", () => {
-    expect(verifyAdminCredentials("", "AdminPassword123!")).toBe(false);
+    expect(verifyAdminCredentials("", DEFAULT_ADMIN_PASSWORD)).toBe(false);
     expect(verifyAdminCredentials("admin@freshtrace.com", "")).toBe(false);
     expect(verifyAdminCredentials(undefined, undefined)).toBe(false);
     expect(verifyAdminCredentials(null, null)).toBe(false);

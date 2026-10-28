@@ -18,6 +18,8 @@ import {
  * - `category` must be one of fruit | vegetable | other.
  * - `defaultUnit` must be one of kg | piece | bunch.
  * - `baseUnitPrice` is an integer number of BDT, strictly positive.
+ * - `costUnitPrice` is an optional integer number of BDT: the aggregator's
+ *   wholesale cost, which must not exceed the retail price.
  * - `harvestToShelfDays` is an integer number of days, strictly positive.
  */
 
@@ -28,6 +30,7 @@ import {
  * @property {string} category
  * @property {string} defaultUnit
  * @property {number} baseUnitPrice
+ * @property {number} [costUnitPrice]
  * @property {string} [imageUrl]
  * @property {string} [description]
  * @property {string} [originDistrict]
@@ -55,6 +58,23 @@ export function validateProductInput(body) {
   const defaultUnit = requireEnum(v, input.defaultUnit, "defaultUnit", PRODUCT_UNITS);
   const baseUnitPrice = requireInt(v, input.baseUnitPrice, "baseUnitPrice", { min: 1 });
 
+  // The aggregator's wholesale cost. Optional — a product can be listed
+  // before its cost has been quoted — but when present it must be positive
+  // and must not exceed the retail price, or the product would be sold at
+  // a loss by construction.
+  const costUnitPrice =
+    input.costUnitPrice === undefined || input.costUnitPrice === null
+      ? null
+      : requireInt(v, input.costUnitPrice, "costUnitPrice", { min: 1 });
+  if (
+    costUnitPrice !== null &&
+    costUnitPrice !== undefined &&
+    baseUnitPrice !== undefined &&
+    costUnitPrice > baseUnitPrice
+  ) {
+    v.add("costUnitPrice", "Must not be higher than the retail price.");
+  }
+
   const imageUrl = optionalString(v, input.imageUrl, "imageUrl", 500);
   const description = optionalString(v, input.description, "description", 2000);
   const originDistrict = optionalString(v, input.originDistrict, "originDistrict", 100);
@@ -74,6 +94,7 @@ export function validateProductInput(body) {
     category,
     defaultUnit,
     baseUnitPrice,
+    costUnitPrice,
     imageUrl,
     description,
     originDistrict,
@@ -108,6 +129,15 @@ export function validateProductUpdate(body) {
   }
   if (input.baseUnitPrice !== undefined) {
     data.baseUnitPrice = requireInt(v, input.baseUnitPrice, "baseUnitPrice", { min: 1 });
+  }
+  if (input.costUnitPrice !== undefined) {
+    if (input.costUnitPrice === null) {
+      // Explicitly clearing the cost is allowed — the aggregator may quote
+      // a new one later.
+      data.costUnitPrice = null;
+    } else {
+      data.costUnitPrice = requireInt(v, input.costUnitPrice, "costUnitPrice", { min: 1 });
+    }
   }
   if (input.harvestToShelfDays !== undefined) {
     data.harvestToShelfDays = requireInt(v, input.harvestToShelfDays, "harvestToShelfDays", {

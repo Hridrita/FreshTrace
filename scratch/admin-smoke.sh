@@ -67,7 +67,7 @@ check "wrong password is rejected" "401" "$code"
 
 code=$(curl -s -c "$JAR" -o /dev/null -w '%{http_code}' -X POST "$BASE/api/auth/login" \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@freshtrace.com","password":"AdminPassword123!"}')
+  -d '{"email":"admin@freshtrace.com","password":"FreshTrace!2026"}')
 check "fixed credential signs in" "200" "$code"
 
 if grep -q 'ft_admin_session' "$JAR"; then

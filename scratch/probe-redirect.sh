@@ -11,7 +11,7 @@ echo
 echo "=== with session ==="
 curl -s -c "$JAR" -o /dev/null -X POST "$BASE/api/auth/login" \
   -H 'Content-Type: application/json' \
-  -d '{"email":"admin@freshtrace.com","password":"AdminPassword123!"}'
+  -d '{"email":"admin@freshtrace.com","password":"FreshTrace!2026"}'
 
 curl -s -b "$JAR" -o /dev/null -w "  /app/admin          status=%{http_code} redirect=%{redirect_url}\n" "$BASE/app/admin"
 curl -s -b "$JAR" -o /dev/null -w "  /app/admin/login    status=%{http_code} redirect=%{redirect_url}\n" "$BASE/app/admin/login"

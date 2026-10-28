@@ -16,7 +16,7 @@ const page = await context.newPage();
 
 await page.goto(`${BASE}/login`, { waitUntil: "networkidle" });
 await page.fill('input[name="email"]', "admin@freshtrace.com");
-await page.fill('input[name="password"]', "AdminPassword123!");
+await page.fill('input[name="password"]', "FreshTrace!2026");
 await page.click('button[type="submit"]');
 await page.waitForURL(/\/app\/admin(\/|$)/, { timeout: 15000 });
 await page.waitForTimeout(800);

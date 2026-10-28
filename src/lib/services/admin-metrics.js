@@ -22,6 +22,50 @@ import { prisma } from "@/lib/prisma";
 export const DEFAULT_WINDOW_DAYS = 30;
 
 /**
+ * How much of the retail freshness discount the aggregator absorbs.
+ *
+ * The retail price falls with the tier (fresh 1.0 → near_expiry 0.3), but
+ * the aggregator's wholesale cost falls by less: an aggregator sells aging
+ * stock cheaper than it would have sold it fresh, but it does not absorb the
+ * full retail discount.
+ *
+ * `COST_DECAY` is the exponent applied to the tier's retail multiplier:
+ *
+ * - `cost = costUnitPrice × multiplier ^ COST_DECAY`
+ *
+ * At `0.5` the cost is the square root of the retail discount — a tier
+ * selling at 30% of retail cost roughly 55% of fresh wholesale. At `1` the
+ * cost would fall exactly in line with the retail price, leaving a constant
+ * margin on every tier, which is not how produce actually trades.
+ */
+export const COST_DECAY = 0.5;
+
+/**
+ * The cost multiplier for a freshness tier.
+ *
+ * @param {string | null | undefined} tier
+ * @returns {number}
+ */
+function costMultiplierForTier(tier) {
+  // The retail multipliers, mirrored from the decay engine so the margin
+  // calculation does not need to recompute a tier for a historical sale.
+  const RETAIL_MULTIPLIER = {
+    fresh: 1.0,
+    good: 0.8,
+    fair: 0.6,
+    near_expiry: 0.3,
+    expired: 0,
+  };
+
+  const retail = RETAIL_MULTIPLIER[/** @type {keyof typeof RETAIL_MULTIPLIER} */ (tier ?? "")];
+  if (retail === undefined) return 1;
+  // An expired batch cannot be sold at all, so it never reaches an order.
+  if (retail === 0) return 0;
+
+  return retail ** COST_DECAY;
+}
+
+/**
  * The start of the reporting window.
  *
  * @param {Date} now
@@ -129,10 +173,14 @@ export async function getAdminMetrics({ now = new Date(), windowDays = DEFAULT_W
       select: {
         qty: true,
         lineTotal: true,
+        // The tier the batch was in when it was sold. The wholesale cost
+        // falls with the tier, so the cost of a line is measured against
+        // the price that tier actually fetched.
+        freshnessTierAtOrder: true,
         batch: {
           select: {
             inboundQty: true,
-            product: { select: { baseUnitPrice: true } },
+            product: { select: { costUnitPrice: true } },
           },
         },
       },
@@ -167,11 +215,30 @@ export async function getAdminMetrics({ now = new Date(), windowDays = DEFAULT_W
   const revenueInWindow = orderTotals.reduce((sum, order) => sum + order.grandTotal, 0);
   const deliveryFees = orderTotals.reduce((sum, order) => sum + order.deliveryFee, 0);
 
-  // The cost of goods is the *base* (pre-discount) value of what was sold.
-  // A freshness discount is a margin reduction, not a cost — so the cost is
-  // the undiscounted price of the quantity sold.
+  // The cost of goods is what FreshTrace paid the aggregator for what was
+  // sold — `costUnitPrice`, the wholesale cost per unit. Revenue is the
+  // *retail* price (`baseUnitPrice`) adjusted by the freshness tier, so the
+  // spread between the two is the platform's gross margin.
+  //
+  // A freshness discount is a margin reduction, not a cost: the cost of a
+  // kilo of tomatoes is the same however it was priced. Charging the retail
+  // price as the cost would make every sale margin-free and every
+  // discounted sale a loss, which is why the cost is its own field.
+  //
+  // The *wholesale* cost falls with the tier too, though not by as much as
+  // the retail price: an aggregator sells aging stock at a discount, but not
+  // the full retail discount. `COST_DECAY` is how much of the retail
+  // discount the aggregator absorbs.
+  //
+  // A product with no quoted cost contributes nothing to COGS. It is
+  // listed before its aggregator has quoted one, and guessing a cost would
+  // put a fabricated number on the dashboard.
   const cogs = costOfGoods.reduce(
-    (sum, item) => sum + item.qty * item.batch.product.baseUnitPrice,
+    (sum, item) =>
+      sum +
+      item.qty *
+        (item.batch.product.costUnitPrice ?? 0) *
+        costMultiplierForTier(item.freshnessTierAtOrder),
     0,
   );
 
