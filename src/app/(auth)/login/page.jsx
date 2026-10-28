@@ -10,6 +10,12 @@ import AuthForm, { AuthFormSkeleton } from "@/components/AuthForm";
  * customer shell, so a signed-out visitor gets a focused page rather than
  * the catalogue header.
  *
+ * This is the **only** sign-in page. Customers and FreshTrace operators use
+ * the same form: the route behind it decides which kind of session to open
+ * and sends each visitor to the right place. An operator who was bounced
+ * out of the operations panel arrives here with `?next=` already set, and
+ * lands back on the page they were trying to reach.
+ *
  * @param {object} props
  * @param {Promise<{ next?: string | string[] }>} props.searchParams
  */

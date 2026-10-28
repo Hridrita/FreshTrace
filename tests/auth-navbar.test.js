@@ -108,6 +108,13 @@ describe("customer Navbar — signed out", () => {
     expect(has(html, 'href="/app/cart"')).toBe(false);
   });
 
+  it("does not show the Admin Dashboard link to a signed-out visitor", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin"')).toBe(false);
+    expect(has(html, "Admin Dashboard")).toBe(false);
+  });
+
   it("keeps the catalogue link live", async () => {
     expect(has(await render(), 'href="/app/products"')).toBe(true);
   });
@@ -163,6 +170,64 @@ describe("customer Navbar — signed in", () => {
 
     expect(has(html, "You have an active subscription")).toBe(false);
   });
+
+  it("does not show the Admin Dashboard link to a non-admin customer", async () => {
+    // The link is gated on the account role. A customer must not see a
+    // route they cannot use.
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin"')).toBe(false);
+    expect(has(html, "Admin Dashboard")).toBe(false);
+  });
+});
+
+describe("customer Navbar — admin account", () => {
+  beforeEach(() => {
+    sessionState.session = {
+      id: "session-1",
+      user: {
+        id: "user-admin",
+        name: "Operations Lead",
+        email: "admin@freshtrace.com",
+        role: "admin",
+        status: "active",
+      },
+    };
+  });
+
+  it("shows the Admin Dashboard link", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin"')).toBe(true);
+    expect(has(html, "Admin Dashboard")).toBe(true);
+  });
+
+  it("keeps the other signed-in links alongside it", async () => {
+    const html = await render();
+
+    expect(has(html, 'href="/app/products"')).toBe(true);
+    expect(has(html, 'href="/app/orders"')).toBe(true);
+    expect(has(html, 'href="/app/subscriptions"')).toBe(true);
+    expect(has(html, 'href="/app/account"')).toBe(true);
+  });
+
+  it("points at the panel root, not the login page", async () => {
+    // The link targets the dashboard itself. The panel's own guard decides
+    // whether the visitor needs to sign in first.
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin"')).toBe(true);
+    expect(has(html, 'href="/app/admin/login"')).toBe(false);
+  });
+
+  it("does not link to a retired admin-only login route", async () => {
+    // There is one sign-in page for the whole application, so the navbar
+    // must not point anywhere near the old dedicated admin login.
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin/login"')).toBe(false);
+    expect(has(html, 'href="/admin/login"')).toBe(false);
+  });
 });
 
 describe("customer Navbar — suspended user", () => {
@@ -186,6 +251,30 @@ describe("customer Navbar — suspended user", () => {
 
     expect(has(html, 'href="/login"')).toBe(true);
     expect(has(html, "Log out")).toBe(false);
+  });
+});
+
+describe("customer Navbar — suspended admin account", () => {
+  beforeEach(() => {
+    sessionState.session = {
+      id: "session-1",
+      user: {
+        id: "user-admin",
+        name: "Suspended Admin",
+        email: "admin@freshtrace.com",
+        role: "admin",
+        status: "suspended",
+      },
+    };
+  });
+
+  it("does not show the Admin Dashboard link", async () => {
+    // A suspended account is treated as signed out, so the admin link must
+    // not survive the role check.
+    const html = await render();
+
+    expect(has(html, 'href="/app/admin"')).toBe(false);
+    expect(has(html, "Admin Dashboard")).toBe(false);
   });
 });
 

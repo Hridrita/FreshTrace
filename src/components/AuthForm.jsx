@@ -12,11 +12,26 @@ import { DEFAULT_REDIRECT, safeRedirectPath } from "@/lib/auth/redirect";
  * SRS §9.2: the form is a Client Component; the pages around it are Server
  * Components. The form talks to the two existing API routes:
  *
- * - `POST /api/auth/login` — sets the `ft_session` cookie.
+ * - `POST /api/auth/login` — sets the session cookie.
  * - `POST /api/auth/register` — creates the account *and* sets the cookie.
  *
  * The session token itself never reaches the client: it travels in the
  * httpOnly cookie, so there is nothing to store in JavaScript.
+ *
+ * ## One form for customers and operators
+ *
+ * There is a single sign-in page for the whole application. `POST
+ * /api/auth/login` decides what kind of session to open and reports it back
+ * in `data.kind`:
+ *
+ * - `kind: "user"` — an ordinary customer session; the visitor follows the
+ *   `?next=` target (or the catalogue, by default).
+ * - `kind: "admin"` — the dedicated operations session; the visitor is sent
+ *   to the admin panel.
+ *
+ * The distinction is made entirely server-side. The form just follows the
+ * destination the route hands back, so there is no way for the client to
+ * claim an admin session it does not hold.
  */
 
 /**
@@ -120,8 +135,19 @@ export default function AuthForm({ mode }) {
 
       // The cookie is already set by the route; the redirect just needs the
       // server components to re-read it.
+      //
+      // The route decides which session was opened. An operations operator
+      // gets the dedicated admin session and is sent straight to the
+      // panel; everyone else gets the customer session and follows the
+      // `?next=` target. The admin destination is validated with the same
+      // helper as any other redirect, so the response can never push the
+      // browser off-site.
+      const adminRedirect = body?.data?.kind === "admin"
+        ? safeRedirectPath(body?.data?.redirectTo)
+        : null;
+
       navigated = true;
-      router.push(redirectTo);
+      router.push(adminRedirect ?? redirectTo);
       router.refresh();
     } catch {
       setGeneralError("Could not reach the server. Please try again.");
