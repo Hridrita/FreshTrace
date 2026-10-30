@@ -34,16 +34,18 @@ jobs:
           npm run build
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+        uses: amondnet/vercel-action@v42
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          # The action defaults to vercel@25.1.0, which cannot resolve a
-          # project from VERCEL_ORG_ID/VERCEL_PROJECT_ID alone and fails with
-          # "Could not retrieve Project Settings" — there is no linked
-          # .vercel/project.json in CI, because that directory is git-ignored.
-          # Vercel CLI 31 is the first release that honours those environment
-          # variables, so the CLI is pinned explicitly.
-          vercel-version: '31.0.0'
+          # The Vercel project pins Node.js 26.x, and the CLI has to understand
+          # that version to build it. Vercel CLI 64 is the first release that
+          # accepts Node.js 26; older CLIs abort with "Found invalid Node.js
+          # Version: 26.x", and CLI 25 (the v25 action's default) cannot even
+          # resolve a project from VERCEL_ORG_ID/VERCEL_PROJECT_ID, because CI
+          # has no linked .vercel/project.json — that directory is git-ignored.
+          vercel-version: '65.8.0'
           vercel-args: '--prod'
+          # github-comment defaults to true, and it needs a token to post to.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
