@@ -60,8 +60,10 @@ export default async function CustomerLayout({ children }) {
         */}
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 sm:px-6 md:h-16 md:flex-row md:items-center md:gap-6 md:py-0 lg:px-8">
           <div className="flex items-center gap-3">
+            {/* The brand mark goes home — the marketing landing page at
+                `/` — rather than straight into the catalogue. */}
             <Link
-              href="/app/products"
+              href="/"
               className="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-sand-900"
             >
               <span className="flex size-8 items-center justify-center rounded-lg bg-brand-600 text-white">
@@ -91,6 +93,19 @@ export default async function CustomerLayout({ children }) {
             className="-mx-4 flex items-center gap-1 overflow-x-auto px-4 pb-0.5 text-sm font-medium text-sand-600 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:overflow-visible md:px-0 md:pb-0"
             aria-label="Main"
           >
+            {/* ── Home ───────────────────────────────────────────────
+                The marketing landing page. It is public, so it is
+                available whether or not anybody is signed in. */}
+            <Link
+              href="/"
+              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+            >
+              Home
+            </Link>
+
+            {/* ── Catalogue ──────────────────────────────────────────
+                The catalogue is deliberately public: a shopper can browse
+                produce, prices and batch details without an account. */}
             <Link
               href="/app/products"
               className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
@@ -150,51 +165,62 @@ export default async function CustomerLayout({ children }) {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            {/* ── Signed-in actions ─────────────────────────────────────
+                Cart, Account and the profile/logout control all belong to
+                an account. A signed-out visitor gets none of them — the
+                links would only bounce off the guard in the page they
+                point at, which is a worse experience than not offering
+                them at all. */}
             {user ? (
-              <Link
-                href="/app/cart"
-                className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
-              >
-                <span className="relative">
-                  <ShoppingBasket className="size-4" aria-hidden="true" />
-                  {cartCount > 0 ? (
-                    <span className="absolute -right-2 -top-1.5 flex min-w-4 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-semibold leading-4 text-white">
-                      {cartCount}
-                    </span>
-                  ) : null}
-                </span>
-                <span className="hidden sm:inline">Cart</span>
-              </Link>
-            ) : null}
-
-            <Link
-              href="/app/account"
-              className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
-            >
-              <User className="size-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Account</span>
-            </Link>
-
-            {/* ── SessionUser slot ─────────────────────────────────────
-                Signed out: Login + Register. Signed in: the user's name
-                and a Log out control. */}
-            {user ? (
-              <div className="ml-1 flex items-center gap-1.5">
-                <span className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-700 md:inline-flex">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
-                    {initials(user.name, user.email)}
+              <>
+                <Link
+                  href="/app/cart"
+                  className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
+                >
+                  <span className="relative">
+                    <ShoppingBasket className="size-4" aria-hidden="true" />
+                    {cartCount > 0 ? (
+                      <span className="absolute -right-2 -top-1.5 flex min-w-4 items-center justify-center rounded-full bg-brand-600 px-1 text-[10px] font-semibold leading-4 text-white">
+                        {cartCount}
+                      </span>
+                    ) : null}
                   </span>
-                  <span className="max-w-[10rem] truncate">{user.name ?? user.email}</span>
-                </span>
-                <LogoutButton />
-              </div>
+                  <span className="hidden sm:inline">Cart</span>
+                </Link>
+
+                <Link
+                  href="/app/account"
+                  className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
+                >
+                  <User className="size-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Account</span>
+                </Link>
+
+                {/* ── Profile slot ─────────────────────────────────────
+                    The user's initials, their name and a Log out control. */}
+                <div className="ml-1 flex items-center gap-1.5">
+                  <span className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-700 md:inline-flex">
+                    <span className="flex size-6 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
+                      {initials(user.name, user.email)}
+                    </span>
+                    <span className="max-w-[10rem] truncate">
+                      {user.name ?? user.email}
+                    </span>
+                  </span>
+                  <LogoutButton />
+                </div>
+              </>
             ) : (
+              /* ── Signed-out actions ───────────────────────────────────
+                  Only public destinations. "Sign in" leads to the login
+                  page and "Register" to sign-up; both carry the landing
+                  page as their home. */
               <div className="ml-1 flex items-center gap-1.5">
                 <Link
                   href="/login"
                   className="rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
                 >
-                  Login
+                  Sign in
                 </Link>
                 <Link
                   href="/register"

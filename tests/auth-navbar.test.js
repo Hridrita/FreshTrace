@@ -86,12 +86,18 @@ describe("customer Navbar — signed out", () => {
     expect(has(html, "Log out")).toBe(false);
   });
 
-  it("links to the account page", async () => {
+  it("shows only public destinations", async () => {
     const html = await render();
 
-    // Cart, Orders, Subscriptions and Account are all real pages now, so
-    // there is no unbuilt destination left in the header.
-    expect(has(html, 'href="/app/account"')).toBe(true);
+    // A signed-out visitor is offered the public routes only. The account
+    // page is behind the auth guard, so a link to it would just bounce
+    // the visitor off a redirect before they got anywhere.
+    expect(has(html, 'href="/app/account"')).toBe(false);
+    expect(has(html, 'href="/app/orders"')).toBe(false);
+
+    // The catalogue and the landing page are open to everyone.
+    expect(has(html, 'href="/app/products"')).toBe(true);
+    expect(has(html, 'href="/"')).toBe(true);
 
     expect(has(html, 'aria-disabled="true"')).toBe(false);
   });

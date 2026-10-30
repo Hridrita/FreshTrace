@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft, ShoppingBasket, Truck } from "lucide-react";
 import CartLineItem from "@/components/CartLineItem";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { getCartForUser } from "@/lib/cart";
 import { formatBDT } from "@/lib/freshness";
 
@@ -21,14 +20,9 @@ export const metadata = {
 };
 
 export default async function CartPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
   // A cart belongs to a customer, so a signed-out visitor is sent to the
   // login screen. The `next` parameter brings them back afterwards.
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Fcart");
-  }
+  const user = await requireCustomerSession("/app/cart");
 
   const cart = await getCartForUser(user.id);
 

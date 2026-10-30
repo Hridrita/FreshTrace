@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft, CheckCircle2, MapPin, Truck } from "lucide-react";
 import FreshnessBadge from "@/components/FreshnessBadge";
 import OrderStatusBadge from "@/components/OrderStatusBadge";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { getOrder } from "@/lib/services/orders";
 import { formatBDT, formatDate, formatQty, formatUnit } from "@/lib/freshness";
 
@@ -24,12 +24,9 @@ export const metadata = {
 export default async function OrderDetailPage({ params }) {
   const { id } = await params;
 
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect(`/login?next=${encodeURIComponent(`/app/orders/${id}`)}`);
-  }
+  // The order belongs to an account. The guard sends a signed-out visitor to
+  // the login screen and returns them to this exact order afterwards.
+  const user = await requireCustomerSession(`/app/orders/${id}`);
 
   const order = await getOrder(user.id, id).catch(() => null);
 

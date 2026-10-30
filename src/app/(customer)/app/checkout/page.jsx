@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft, PackageCheck } from "lucide-react";
 import CheckoutForm from "@/components/CheckoutForm";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { getAddressesForUser, getCartForUser } from "@/lib/cart";
 import { formatBDT, formatQty, formatUnit } from "@/lib/freshness";
 
@@ -21,12 +20,9 @@ export const metadata = {
 };
 
 export default async function CheckoutPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Fcheckout");
-  }
+  // Placing an order belongs to an account, so a signed-out visitor is sent
+  // to the login screen and returned here afterwards.
+  const user = await requireCustomerSession("/app/checkout");
 
   const [cart, addresses] = await Promise.all([
     getCartForUser(user.id),
