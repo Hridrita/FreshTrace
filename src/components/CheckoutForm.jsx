@@ -263,7 +263,7 @@ export default function CheckoutForm({
             return (
               <label
                 key={method}
-                className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-3 py-2.5 transition ${
+                className={`flex cursor-pointer flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-lg border px-3 py-2.5 transition ${
                   isSelected
                     ? "border-brand-500 bg-brand-50/70 ring-1 ring-brand-500/30"
                     : "border-sand-200 bg-white hover:border-sand-300"
@@ -276,13 +276,15 @@ export default function CheckoutForm({
                     value={method}
                     checked={isSelected}
                     onChange={() => setPaymentMethod(method)}
-                    className="size-4 accent-brand-600"
+                    className="size-4 shrink-0 accent-brand-600"
                   />
                   <span className="text-sm font-medium text-sand-900">
                     {PAYMENT_METHOD_LABELS[method].label}
                   </span>
                 </span>
-                <span className="text-xs text-sand-500">
+                {/* The note sits under the label on a phone, where the two
+                    would not fit side by side. */}
+                <span className="pl-7 text-xs text-sand-500 sm:pl-0">
                   {PAYMENT_METHOD_LABELS[method].note}
                 </span>
               </label>

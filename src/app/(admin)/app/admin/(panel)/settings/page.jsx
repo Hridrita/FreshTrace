@@ -62,12 +62,14 @@ export default function AdminSettingsPage() {
       >
         <div className="space-y-4 px-5 py-4">
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                 <KeyRound className="size-4" aria-hidden="true" />
               </span>
-              <div>
-                <p className="text-sm font-medium text-sand-900">{adminEmail}</p>
+              <div className="min-w-0">
+                <p className="break-all text-sm font-medium text-sand-900">
+                  {adminEmail}
+                </p>
                 <p className="text-xs text-sand-500">
                   Set by <code className="font-mono text-[11px]">ADMIN_EMAIL</code>
                 </p>
@@ -77,12 +79,14 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/60 px-4 py-3">
-            <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-full bg-brand-100 text-brand-700">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700">
                 <KeyRound className="size-4" aria-hidden="true" />
               </span>
-              <div>
-                <p className="font-mono text-sm text-sand-900">{maskSecret(adminPassword)}</p>
+              <div className="min-w-0">
+                <p className="break-all font-mono text-sm text-sand-900">
+                  {maskSecret(adminPassword)}
+                </p>
                 <p className="text-xs text-sand-500">
                   Set by <code className="font-mono text-[11px]">ADMIN_PASSWORD</code>
                 </p>
@@ -157,7 +161,12 @@ export default function AdminSettingsPage() {
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-sand-500">{row.days}</p>
-                <p className="mt-1 font-mono text-[10px] text-sand-400">{row.env}</p>
+                {/* The env-var name is long and has no spaces to break on, so
+                    it is allowed to break anywhere rather than overflow the
+                    card on a phone. */}
+                <p className="mt-1 break-all font-mono text-[11px] leading-snug text-sand-500">
+                  {row.env}
+                </p>
               </li>
             ))}
           </ul>

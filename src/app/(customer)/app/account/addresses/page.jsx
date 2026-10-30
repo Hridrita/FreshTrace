@@ -32,7 +32,7 @@ export default async function AccountAddressesPage() {
   const addresses = await listAddresses(user.id);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Back link ──────────────────────────────────────────────── */}
       <nav aria-label="Breadcrumb" className="mb-6">
         <Link
@@ -45,7 +45,7 @@ export default async function AccountAddressesPage() {
       </nav>
 
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Delivery addresses
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">
@@ -56,14 +56,14 @@ export default async function AccountAddressesPage() {
       </div>
 
       <section className="mt-8 overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-        <div className="flex items-center gap-2 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
-          <MapPin className="size-4 text-sand-500" aria-hidden="true" />
+        <div className="flex items-center gap-2 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
+          <MapPin className="size-4 shrink-0 text-sand-500" aria-hidden="true" />
           <h2 className="text-base font-semibold tracking-tight text-sand-900">
             Your addresses
           </h2>
         </div>
 
-        <div className="p-5">
+        <div className="p-4 sm:p-5">
           <AddressManager addresses={toAddressViews(addresses)} />
         </div>
       </section>

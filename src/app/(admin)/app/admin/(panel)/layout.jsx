@@ -39,7 +39,12 @@ export default async function AdminLayout({ children }) {
   await requireAdminPage("/app/admin");
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-sand-50">
+    // `overflow-x-clip` rather than `overflow-x-hidden`: `hidden` makes this
+    // element a scroll container, which silently swallows the horizontal
+    // scroll of every nested `overflow-x-auto` (the data tables and the pill
+    // navigation). `clip` trims the overflowing ambient washes without
+    // creating a scroll container, so the tables still scroll sideways.
+    <div className="relative min-h-screen overflow-x-clip bg-sand-50">
       {/* ── Ambient wash ──────────────────────────────────────────────
           A soft green gradient behind the frosted surfaces, so the
           `backdrop-blur` has colour to diffuse. Decorative only. */}

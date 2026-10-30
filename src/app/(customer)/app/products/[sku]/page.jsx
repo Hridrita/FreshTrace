@@ -82,7 +82,7 @@ async function ProductDetail({ sku }) {
   const bestBatch = batches[0] ?? null;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Breadcrumb ────────────────────────────────────────────── */}
       <nav aria-label="Breadcrumb" className="mb-6">
         <Link
@@ -94,7 +94,7 @@ async function ProductDetail({ sku }) {
         </Link>
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-10">
         {/* ── Main column ──────────────────────────────────────────── */}
         <div>
           <div className="flex aspect-[16/9] items-center justify-center overflow-hidden rounded-card bg-gradient-to-br from-brand-50 via-sand-50 to-sand-100">
@@ -127,7 +127,7 @@ async function ProductDetail({ sku }) {
 
           {/* ── Available batches ──────────────────────────────────── */}
           <div className="mt-10">
-            <div className="flex items-baseline justify-between gap-4">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <h2 className="text-lg font-semibold text-sand-900">
                 Available batches
               </h2>
@@ -139,7 +139,7 @@ async function ProductDetail({ sku }) {
             </div>
 
             {batches.length === 0 ? (
-              <div className="mt-4 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-16 text-center">
+              <div className="mt-4 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-14 text-center sm:py-16">
                 <span className="flex size-12 items-center justify-center rounded-full bg-sand-100 text-sand-400">
                   <PackageSearch className="size-6" aria-hidden="true" />
                 </span>
@@ -173,7 +173,7 @@ async function ProductDetail({ sku }) {
 
         {/* ── Sidebar ──────────────────────────────────────────────── */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-card border border-sand-200 bg-white p-6 shadow-soft">
+          <div className="rounded-card border border-sand-200 bg-white p-4 shadow-soft sm:p-6">
             <p className="text-xs font-medium uppercase tracking-wide text-sand-500">
               {getCategoryLabel(product.category)}
             </p>
@@ -181,7 +181,9 @@ async function ProductDetail({ sku }) {
               {product.name}
             </h1>
 
-            <p className="mt-1 font-mono text-xs text-sand-400">{product.sku}</p>
+            <p className="mt-1 break-all font-mono text-xs text-sand-400">
+              {product.sku}
+            </p>
 
             {bestBatch ? (
               <div className="mt-4">
@@ -194,8 +196,8 @@ async function ProductDetail({ sku }) {
 
             {/* ── Price ────────────────────────────────────────────── */}
             <div className="mt-6 border-t border-sand-100 pt-6">
-              <div className="flex items-end gap-2">
-                <span className="text-3xl font-semibold tracking-tight text-sand-900">
+              <div className="flex flex-wrap items-end gap-x-2 gap-y-1">
+                <span className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
                   {formatBDT(lowestPrice)}
                 </span>
                 <span className="pb-1 text-sm text-sand-500">
@@ -215,8 +217,10 @@ async function ProductDetail({ sku }) {
             </div>
 
             {/* ── Attributes ───────────────────────────────────────── */}
+            {/* Each attribute stacks its label above its value on a narrow
+                sidebar, so a long district name cannot crush the label. */}
             <dl className="mt-6 space-y-3.5 border-t border-sand-100 pt-6 text-sm">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-0.5">
                 <dt className="flex items-center gap-2 text-sand-500">
                   <Tag className="size-4 shrink-0" aria-hidden="true" />
                   Shelf life
@@ -227,18 +231,18 @@ async function ProductDetail({ sku }) {
               </div>
 
               {product.originDistrict ? (
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-0.5">
                   <dt className="flex items-center gap-2 text-sand-500">
                     <MapPin className="size-4 shrink-0" aria-hidden="true" />
                     Origin
                   </dt>
-                  <dd className="font-medium text-sand-800">
+                  <dd className="min-w-0 break-words font-medium text-sand-800">
                     {product.originDistrict}
                   </dd>
                 </div>
               ) : null}
 
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-0.5">
                 <dt className="text-sand-500">Sold by</dt>
                 <dd className="font-medium text-sand-800">
                   {formatUnit(product.defaultUnit)}

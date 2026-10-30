@@ -68,10 +68,10 @@ export default async function AccountPage() {
   const recentOrders = orders.slice(0, 3);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Page header ────────────────────────────────────────────── */}
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Your account
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">
@@ -83,14 +83,14 @@ export default async function AccountPage() {
       <div className="mt-8 space-y-6">
         {/* ── Profile ──────────────────────────────────────────────── */}
         <section className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-          <div className="flex items-center gap-2 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
-            <User className="size-4 text-sand-500" aria-hidden="true" />
+          <div className="flex items-center gap-2 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
+            <User className="size-4 shrink-0 text-sand-500" aria-hidden="true" />
             <h2 className="text-base font-semibold tracking-tight text-sand-900">
               Your details
             </h2>
           </div>
 
-          <div className="p-5">
+          <div className="p-4 sm:p-5">
             <ProfileForm
               profile={{
                 name: user.name,
@@ -102,9 +102,9 @@ export default async function AccountPage() {
 
         {/* ── Delivery addresses ───────────────────────────────────── */}
         <section className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2">
-              <MapPin className="size-4 text-sand-500" aria-hidden="true" />
+              <MapPin className="size-4 shrink-0 text-sand-500" aria-hidden="true" />
               <h2 className="text-base font-semibold tracking-tight text-sand-900">
                 Delivery addresses
               </h2>
@@ -112,14 +112,14 @@ export default async function AccountPage() {
 
             <Link
               href="/app/account/addresses"
-              className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
+              className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
             >
               Manage addresses
               <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
           </div>
 
-          <div className="p-5">
+          <div className="p-4 sm:p-5">
             <p className="mb-4 text-sm leading-relaxed text-sand-600">
               The address you pick as the default is the one your weekly
               deliveries go to.
@@ -131,9 +131,9 @@ export default async function AccountPage() {
 
         {/* ── Subscription ─────────────────────────────────────────── */}
         <section className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2">
-              <Package className="size-4 text-sand-500" aria-hidden="true" />
+              <Package className="size-4 shrink-0 text-sand-500" aria-hidden="true" />
               <h2 className="text-base font-semibold tracking-tight text-sand-900">
                 Your subscription
               </h2>
@@ -150,7 +150,7 @@ export default async function AccountPage() {
               products={products}
             />
           ) : (
-            <div className="px-5 py-8 text-center">
+            <div className="px-4 py-8 text-center sm:px-5">
               <h3 className="text-base font-semibold text-sand-900">
                 No subscription yet
               </h3>
@@ -172,9 +172,9 @@ export default async function AccountPage() {
 
         {/* ── Orders ───────────────────────────────────────────────── */}
         <section className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2">
-              <Receipt className="size-4 text-sand-500" aria-hidden="true" />
+              <Receipt className="size-4 shrink-0 text-sand-500" aria-hidden="true" />
               <h2 className="text-base font-semibold tracking-tight text-sand-900">
                 Recent orders
               </h2>
@@ -182,7 +182,7 @@ export default async function AccountPage() {
 
             <Link
               href="/app/orders"
-              className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
+              className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
             >
               View all orders
               <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -190,7 +190,7 @@ export default async function AccountPage() {
           </div>
 
           {recentOrders.length === 0 ? (
-            <div className="px-5 py-8 text-center">
+            <div className="px-4 py-8 text-center sm:px-5">
               <p className="text-sm text-sand-600">
                 You have not ordered anything yet.
               </p>
@@ -208,7 +208,7 @@ export default async function AccountPage() {
                 <li key={order.id}>
                   <Link
                     href={`/app/orders/${order.id}`}
-                    className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 transition hover:bg-sand-50/60"
+                    className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 transition hover:bg-sand-50/60 sm:px-5"
                   >
                     <div className="min-w-0">
                       <p className="font-mono text-sm font-medium text-sand-900">
@@ -226,7 +226,7 @@ export default async function AccountPage() {
                         {formatBDT(order.grandTotal)}
                       </span>
                       <ArrowRight
-                        className="size-4 text-sand-400"
+                        className="size-4 shrink-0 text-sand-400"
                         aria-hidden="true"
                       />
                     </div>
@@ -272,9 +272,9 @@ function SubscriptionOverview({ subscription, products }) {
     <div>
       <div className="grid gap-px bg-sand-100 sm:grid-cols-2">
         {/* Next delivery */}
-        <div className="bg-white/80 px-5 py-4">
+        <div className="bg-white/80 px-4 py-4 sm:px-5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-            <CalendarClock className="size-3.5" aria-hidden="true" />
+            <CalendarClock className="size-3.5 shrink-0" aria-hidden="true" />
             {isPaused ? "Paused until" : "Next delivery"}
           </div>
 
@@ -291,9 +291,9 @@ function SubscriptionOverview({ subscription, products }) {
         </div>
 
         {/* Delivery address */}
-        <div className="bg-white/80 px-5 py-4">
+        <div className="bg-white/80 px-4 py-4 sm:px-5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-            <MapPin className="size-3.5" aria-hidden="true" />
+            <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
             Delivering to
           </div>
 
@@ -301,7 +301,7 @@ function SubscriptionOverview({ subscription, products }) {
             {address?.label ?? "Address"}
           </p>
 
-          <p className="mt-0.5 text-sm text-sand-500">
+          <p className="mt-0.5 break-words text-sm text-sand-500">
             {address
               ? `${address.line1}${address.line2 ? `, ${address.line2}` : ""}, ${address.area}, ${address.city}`
               : "No address on file"}
@@ -310,8 +310,8 @@ function SubscriptionOverview({ subscription, products }) {
       </div>
 
       {/* ── The plan ───────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sand-100 px-5 py-4">
-        <div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-sand-100 px-4 py-4 sm:px-5">
+        <div className="min-w-0">
           <p className="text-sm font-semibold text-sand-900">
             {plan?.name ?? "Weekly basket"}
           </p>
@@ -323,7 +323,7 @@ function SubscriptionOverview({ subscription, products }) {
 
         <Link
           href="/app/subscriptions"
-          className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
+          className="inline-flex shrink-0 items-center gap-1 text-sm font-medium text-brand-700 transition hover:text-brand-800"
         >
           Manage subscription
           <ArrowRight className="size-3.5" aria-hidden="true" />
@@ -332,9 +332,9 @@ function SubscriptionOverview({ subscription, products }) {
 
       {/* ── Subscribed items ───────────────────────────────────────── */}
       {composition.length > 0 ? (
-        <div className="border-t border-sand-100 px-5 py-4">
+        <div className="border-t border-sand-100 px-4 py-4 sm:px-5">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-            <Package className="size-3.5" aria-hidden="true" />
+            <Package className="size-3.5 shrink-0" aria-hidden="true" />
             Items in your weekly basket
           </div>
 

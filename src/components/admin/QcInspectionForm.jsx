@@ -206,6 +206,7 @@ export default function QcInspectionForm({ batches }) {
                 <span className="mt-1 block pl-6 text-[11px] leading-snug text-sand-500">
                   {option.hint}
                 </span>
+                <span className="sr-only">{option.value}</span>
               </label>
             );
           })}
@@ -267,6 +268,8 @@ export default function QcInspectionForm({ batches }) {
 
         <div className="space-y-2">
           {photos.map((photo, index) => (
+            // The remove button drops below the input on a phone so the
+            // URL field gets the full width.
             <div key={index} className="flex items-center gap-2">
               <input
                 type="url"
@@ -279,7 +282,7 @@ export default function QcInspectionForm({ batches }) {
                   )
                 }
                 placeholder="https://… photo URL"
-                className="w-full rounded-2xl border border-sand-200 bg-white/80 px-3.5 py-2 text-sm text-sand-800 outline-none transition placeholder:text-sand-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200/60"
+                className="min-w-0 flex-1 rounded-2xl border border-sand-200 bg-white/80 px-3.5 py-2 text-sm text-sand-800 outline-none transition placeholder:text-sand-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200/60"
               />
               {photos.length > 1 ? (
                 <button

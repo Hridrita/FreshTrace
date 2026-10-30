@@ -42,7 +42,7 @@ export default async function OrderDetailPage({ params }) {
   const address = parseAddressSnapshot(order.addressSnapshot);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Breadcrumb ────────────────────────────────────────────── */}
       <nav aria-label="Breadcrumb" className="mb-6">
         <Link
@@ -56,8 +56,8 @@ export default async function OrderDetailPage({ params }) {
 
       {/* ── Header ────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="font-mono text-2xl font-semibold tracking-tight text-sand-900">
+        <div className="min-w-0">
+          <h1 className="font-mono text-xl font-semibold tracking-tight text-sand-900 sm:text-2xl">
             {order.orderCode}
           </h1>
           <p className="mt-1 text-sm text-sand-600">
@@ -80,7 +80,7 @@ export default async function OrderDetailPage({ params }) {
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         {/* ── Lines ────────────────────────────────────────────────── */}
-        <div className="rounded-card border border-white/40 bg-white/70 p-6 shadow-soft backdrop-blur-md">
+        <div className="rounded-card border border-white/40 bg-white/70 p-4 shadow-soft backdrop-blur-md sm:p-6">
           <h2 className="text-base font-semibold text-sand-900">
             What you ordered
           </h2>
@@ -90,7 +90,9 @@ export default async function OrderDetailPage({ params }) {
               <li key={item.id} className="flex items-start justify-between gap-4 py-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium text-sand-900">{item.name}</span>
+                    <span className="break-words font-medium text-sand-900">
+                      {item.name}
+                    </span>
                     <FreshnessBadge tier={item.freshnessTierAtOrder} size="sm" />
                   </div>
 
@@ -130,9 +132,9 @@ export default async function OrderDetailPage({ params }) {
 
         {/* ── Delivery address ─────────────────────────────────────── */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-card border border-sand-200 bg-white p-6 shadow-soft">
+          <div className="rounded-card border border-sand-200 bg-white p-4 shadow-soft sm:p-6">
             <h2 className="flex items-center gap-2 text-base font-semibold text-sand-900">
-              <MapPin className="size-4 text-sand-400" aria-hidden="true" />
+              <MapPin className="size-4 shrink-0 text-sand-400" aria-hidden="true" />
               Delivery address
             </h2>
 
@@ -141,13 +143,15 @@ export default async function OrderDetailPage({ params }) {
                 <span className="block font-medium text-sand-800">
                   {address.label}
                 </span>
-                <span className="mt-1 block">{address.line1}</span>
-                {address.line2 ? <span className="block">{address.line2}</span> : null}
-                <span className="block">
+                <span className="mt-1 block break-words">{address.line1}</span>
+                {address.line2 ? (
+                  <span className="block break-words">{address.line2}</span>
+                ) : null}
+                <span className="block break-words">
                   {address.area}, {address.city}
                 </span>
                 {address.deliveryNotes ? (
-                  <span className="mt-2 block text-xs text-sand-500">
+                  <span className="mt-2 block break-words text-xs text-sand-500">
                     {address.deliveryNotes}
                   </span>
                 ) : null}

@@ -158,7 +158,7 @@ export default function AddressManager({ addresses }) {
                 className="rounded-card border border-sand-200 bg-white/80 p-4 shadow-soft"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1 basis-56">
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm font-semibold text-sand-900">
                         {address.label}
@@ -172,21 +172,23 @@ export default function AddressManager({ addresses }) {
                       ) : null}
                     </div>
 
-                    <p className="mt-1 text-sm leading-relaxed text-sand-600">
+                    <p className="mt-1 break-words text-sm leading-relaxed text-sand-600">
                       {address.line1}
                       {address.line2 ? `, ${address.line2}` : ""}
                     </p>
-                    <p className="text-sm leading-relaxed text-sand-600">
+                    <p className="break-words text-sm leading-relaxed text-sand-600">
                       {address.area}, {address.city}
                     </p>
 
                     {address.deliveryNotes ? (
-                      <p className="mt-1 text-xs text-sand-500">
+                      <p className="mt-1 break-words text-xs text-sand-500">
                         Note: {address.deliveryNotes}
                       </p>
                     ) : null}
                   </div>
 
+                  {/* The three actions wrap onto their own line on a phone
+                      rather than being squeezed beside the address. */}
                   <div className="flex flex-wrap items-center gap-1.5">
                     {!address.isDefault ? (
                       <button
@@ -210,7 +212,7 @@ export default function AddressManager({ addresses }) {
                       disabled={isPending}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-sand-200 bg-white px-2.5 py-1.5 text-xs font-medium text-sand-700 transition hover:bg-sand-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      <Pencil className="size-3.5" aria-hidden="true" />
+                      <Pencil className="size-3.5 shrink-0" aria-hidden="true" />
                       Edit
                     </button>
 
@@ -227,7 +229,7 @@ export default function AddressManager({ addresses }) {
                       disabled={isPending}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-sand-200 bg-white px-2.5 py-1.5 text-xs font-medium text-expired-700 transition hover:bg-expired-50 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      <Trash2 className="size-3.5" aria-hidden="true" />
+                      <Trash2 className="size-3.5 shrink-0" aria-hidden="true" />
                       Delete
                     </button>
                   </div>

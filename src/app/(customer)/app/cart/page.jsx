@@ -36,10 +36,10 @@ export default async function CartPage() {
   const hasBuyableItems = cart && cart.items.some((line) => line.available);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Page header ────────────────────────────────────────────── */}
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Your cart
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">
@@ -79,7 +79,7 @@ export default async function CartPage() {
 
                 <div className="flex items-center justify-between gap-4">
                   <dt className="flex items-center gap-1.5 text-sand-600">
-                    <Truck className="size-4" aria-hidden="true" />
+                    <Truck className="size-4 shrink-0" aria-hidden="true" />
                     Delivery
                   </dt>
                   <dd className="font-medium text-sand-900">
@@ -129,7 +129,7 @@ export default async function CartPage() {
  */
 function EmptyCart() {
   return (
-    <div className="mt-8 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-20 text-center">
+    <div className="mt-8 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-14 text-center sm:py-20">
       <span className="flex size-12 items-center justify-center rounded-full bg-sand-100 text-sand-400">
         <ShoppingBasket className="size-6" aria-hidden="true" />
       </span>

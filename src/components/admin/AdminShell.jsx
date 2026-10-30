@@ -51,7 +51,7 @@ export default function AdminNav() {
 
   return (
     <nav
-      className="flex items-center gap-1 rounded-full border border-white/60 bg-white/60 p-1 shadow-soft backdrop-blur-md"
+      className="flex w-full items-center gap-1 overflow-x-auto rounded-full border border-white/60 bg-white/60 p-1 shadow-soft backdrop-blur-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       aria-label="Operations sections"
     >
       {NAV_ITEMS.map((item) => {
@@ -63,14 +63,20 @@ export default function AdminNav() {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition ${
+            title={item.label}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition ${
               active
                 ? "bg-brand-500 text-white shadow-soft"
                 : "text-sand-600 hover:bg-white/80 hover:text-sand-900"
             }`}
           >
             <Icon className="size-4" aria-hidden="true" />
+            {/* The label is hidden below `sm`, where the tab is icon-only.
+                It stays in the accessibility tree as screen-reader-only
+                text, so the tab is never announced as an unlabelled
+                button. */}
             <span className="hidden sm:inline">{item.label}</span>
+            <span className="sr-only sm:hidden">{item.label}</span>
           </Link>
         );
       })}

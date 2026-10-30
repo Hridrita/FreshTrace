@@ -39,10 +39,10 @@ export default async function ProductsPage({ searchParams }) {
   const totalCount = categories.reduce((sum, entry) => sum + entry.count, 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Page header ────────────────────────────────────────────── */}
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Today&apos;s produce
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">

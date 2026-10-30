@@ -47,8 +47,10 @@ export default function RefundDecisionControl({ refundId, orderCode, amount }) {
   }
 
   return (
+    // The three decision buttons wrap onto their own lines rather than
+    // forcing the table's last column wide on a phone.
     <span className="inline-flex flex-col items-end gap-1">
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex flex-wrap items-center justify-end gap-1.5">
         <button
           type="button"
           onClick={() => decide("approved")}
@@ -96,7 +98,7 @@ export default function RefundDecisionControl({ refundId, orderCode, amount }) {
       </span>
 
       {error ? (
-        <span role="alert" className="text-[11px] text-expired-700">
+        <span role="alert" className="break-words text-[11px] text-expired-700">
           {error}
         </span>
       ) : null}
