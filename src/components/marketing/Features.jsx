@@ -7,6 +7,7 @@ import {
   Sprout,
   Thermometer,
 } from "lucide-react";
+import { FadeIn, Pressable, Stagger, StaggerItem } from "./animation";
 
 /**
  * Features — the four pillars of the product.
@@ -28,6 +29,11 @@ import {
  * One column on a phone, two from `sm`, four from `lg`. The cards use
  * `flex-col` with `h-full` so the icon, heading and body align across a row
  * regardless of how long the copy runs.
+ *
+ * ## Motion
+ *
+ * The cards animate in one after another as the section scrolls into view,
+ * and each card lifts slightly under the pointer and depresses when tapped.
  */
 const FEATURES = [
   {
@@ -61,7 +67,7 @@ export default function Features() {
     <section id="features" className="scroll-mt-20 bg-sand-50 py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ── Section heading ─────────────────────────────────────────── */}
-        <div className="max-w-2xl">
+        <FadeIn className="max-w-2xl">
           <span className="text-xs font-semibold uppercase tracking-wider text-brand-700">
             Why FreshTrace
           </span>
@@ -73,33 +79,50 @@ export default function Features() {
             you the date it came off the plant, the inspection it passed and
             the people who handled it.
           </p>
-        </div>
+        </FadeIn>
 
         {/* ── Cards ───────────────────────────────────────────────────── */}
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature) => (
-            <FeatureCard key={feature.title} {...feature} />
+        <Stagger
+          className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          stagger={0.1}
+        >
+          {FEATURES.map((feature, index) => (
+            <StaggerItem key={feature.title} index={index} className="h-full">
+              <Pressable className="h-full">
+                <FeatureCard {...feature} />
+              </Pressable>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
 
         {/* ── Supporting strip ────────────────────────────────────────── */}
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <MiniFact
-            icon={Thermometer}
-            title="Cold-chain aware"
-            body="Temperature is recorded at inspection, not guessed at."
-          />
-          <MiniFact
-            icon={Leaf}
-            title="Direct from source"
-            body="Aggregators are paid a wholesale rate, not a consignment fee."
-          />
-          <MiniFact
-            icon={Sprout}
-            title="Priced by freshness"
-            body="One product, one price per tier — never a hidden markdown."
-          />
-        </div>
+        <Stagger
+          className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3"
+          stagger={0.08}
+          delay={0.15}
+        >
+          <StaggerItem index={0} className="h-full">
+            <MiniFact
+              icon={Thermometer}
+              title="Cold-chain aware"
+              body="Temperature is recorded at inspection, not guessed at."
+            />
+          </StaggerItem>
+          <StaggerItem index={1} className="h-full">
+            <MiniFact
+              icon={Leaf}
+              title="Direct from source"
+              body="Aggregators are paid a wholesale rate, not a consignment fee."
+            />
+          </StaggerItem>
+          <StaggerItem index={2} className="h-full">
+            <MiniFact
+              icon={Sprout}
+              title="Priced by freshness"
+              body="One product, one price per tier — never a hidden markdown."
+            />
+          </StaggerItem>
+        </Stagger>
       </div>
     </section>
   );
@@ -120,7 +143,7 @@ export default function Features() {
  */
 function FeatureCard({ icon: Icon, title, body, accent }) {
   return (
-    <article className="flex h-full flex-col rounded-card border border-sand-200 bg-white p-6 shadow-soft transition hover:-translate-y-0.5 hover:shadow-lifted">
+    <article className="flex h-full flex-col rounded-card border border-sand-200 bg-white p-6 shadow-soft transition hover:shadow-lifted">
       <span
         className={`flex size-11 items-center justify-center rounded-xl ring-1 ring-inset ${accent}`}
       >
@@ -146,7 +169,7 @@ function FeatureCard({ icon: Icon, title, body, accent }) {
  */
 function MiniFact({ icon: Icon, title, body }) {
   return (
-    <div className="flex items-start gap-3 rounded-card border border-sand-200 bg-white/70 p-4">
+    <div className="flex h-full items-start gap-3 rounded-card border border-sand-200 bg-white/70 p-4">
       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white text-brand-700 ring-1 ring-inset ring-sand-200">
         <Icon className="size-4" aria-hidden="true" />
       </span>

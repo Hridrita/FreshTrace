@@ -6,6 +6,7 @@ import {
   Truck,
   Warehouse,
 } from "lucide-react";
+import { FadeIn, Stagger, StaggerItem } from "./animation";
 
 /**
  * How It Works — the farm-to-consumer workflow.
@@ -27,6 +28,11 @@ import {
  * that becomes a four-column horizontal track from `lg`. The connector is
  * drawn with a `before` pseudo-element rather than an extra element, so the
  * markup stays a plain ordered list.
+ *
+ * ## Motion
+ *
+ * The four steps reveal themselves in sequence as the track scrolls into
+ * view, so the eye follows the workflow from left to right.
  */
 const STEPS = [
   {
@@ -63,7 +69,7 @@ export default function HowItWorks() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ── Section heading ─────────────────────────────────────────── */}
-        <div className="mx-auto max-w-2xl text-center">
+        <FadeIn className="mx-auto max-w-2xl text-center">
           <span className="text-xs font-semibold uppercase tracking-wider text-brand-700">
             How it works
           </span>
@@ -74,40 +80,53 @@ export default function HowItWorks() {
             Four checkpoints, each one recorded. Nothing enters the catalogue
             without passing through them.
           </p>
-        </div>
+        </FadeIn>
 
         {/* ── Steps ────────────────────────────────────────────────────── */}
-        <ol className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+        {/*
+          The `<ol>` stays a plain ordered list and the animated element is
+          each `<li>` itself, so the connector lines — which are positioned
+          relative to the list item — keep the geometry they rely on.
+        */}
+        <Stagger
+          as="ol"
+          className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6"
+          stagger={0.12}
+        >
           {STEPS.map((step, index) => (
-            <StepCard key={step.title} step={step} index={index} />
+            <StaggerItem key={step.title} index={index} as="li">
+              <StepCard step={step} index={index} />
+            </StaggerItem>
           ))}
-        </ol>
+        </Stagger>
 
         {/* ── Journey strip ────────────────────────────────────────────── */}
-        <div className="mt-12 overflow-hidden rounded-card border border-sand-200 bg-sand-50 p-5 sm:p-6">
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-700 ring-1 ring-inset ring-sand-200">
-                <Warehouse className="size-5" aria-hidden="true" />
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-sand-900">
-                  One hub, one chain of custody
-                </p>
-                <p className="mt-0.5 text-sm text-sand-600">
-                  Everything passes through our Dhaka hub before it reaches you.
-                </p>
+        <FadeIn delay={0.1} className="mt-12">
+          <div className="overflow-hidden rounded-card border border-sand-200 bg-sand-50 p-5 sm:p-6">
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-700 ring-1 ring-inset ring-sand-200">
+                  <Warehouse className="size-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-sand-900">
+                    One hub, one chain of custody
+                  </p>
+                  <p className="mt-0.5 text-sm text-sand-600">
+                    Everything passes through our Dhaka hub before it reaches you.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 items-center gap-2 rounded-full bg-white px-3 py-2 ring-1 ring-inset ring-sand-200">
+                <ShoppingBasket className="size-4 text-brand-700" aria-hidden="true" />
+                <span className="text-sm font-medium text-sand-800">
+                  Delivered across Dhaka
+                </span>
               </div>
             </div>
-
-            <div className="flex shrink-0 items-center gap-2 rounded-full bg-white px-3 py-2 ring-1 ring-inset ring-sand-200">
-              <ShoppingBasket className="size-4 text-brand-700" aria-hidden="true" />
-              <span className="text-sm font-medium text-sand-800">
-                Delivered across Dhaka
-              </span>
-            </div>
           </div>
-        </div>
+        </FadeIn>
       </div>
     </section>
   );
@@ -128,7 +147,7 @@ function StepCard({ step, index }) {
   const { icon: Icon } = step;
 
   return (
-    <li className="group relative flex gap-4 lg:flex-col lg:gap-0">
+    <div className="group relative flex gap-4 lg:flex-col lg:gap-0">
       {/* ── Icon ─────────────────────────────────────────────────────── */}
       <div className="relative flex shrink-0 items-center lg:block">
         <span className="relative z-10 flex size-12 items-center justify-center rounded-2xl border border-brand-200 bg-brand-50 text-brand-700 transition group-hover:border-brand-300 group-hover:bg-brand-100 lg:size-14">
@@ -172,6 +191,6 @@ function StepCard({ step, index }) {
           {step.meta}
         </span>
       </div>
-    </li>
+    </div>
   );
 }
