@@ -15,6 +15,8 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
+RUN node scripts/make-test-schema.mjs
+RUN npx prisma generate --schema=prisma/schema.sqlite.prisma
 RUN npm run build
 
 FROM base AS runner
