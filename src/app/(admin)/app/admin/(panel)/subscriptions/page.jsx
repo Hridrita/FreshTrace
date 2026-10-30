@@ -124,7 +124,10 @@ export default async function AdminSubscriptionsPage({ searchParams }) {
         <FilterSubmit />
       </FilterBar>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_18rem] lg:items-start">
+      {/* The plan-mix panel drops below the register on a phone and tablet.
+          The `minmax(0,1fr)` track lets the table column shrink to fit
+          rather than forcing the grid wider than the viewport. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         {/* ── Subscription table ────────────────────────────────────── */}
         <Panel
           title="Subscription register"
@@ -154,7 +157,7 @@ export default async function AdminSubscriptionsPage({ searchParams }) {
                 key: subscription.id,
                 customer: (
                   <div>
-                    <p className="text-sand-800">
+                    <p className="break-words text-sand-800">
                       {subscription.customer?.name ?? subscription.customer?.email ?? "—"}
                     </p>
                     <p className="text-[11px] text-sand-500">
@@ -165,7 +168,7 @@ export default async function AdminSubscriptionsPage({ searchParams }) {
                 ),
                 plan: (
                   <div>
-                    <p className="text-sand-800">{subscription.plan.name}</p>
+                    <p className="break-words text-sand-800">{subscription.plan.name}</p>
                     <p className="text-[11px] text-sand-500">
                       {formatBDT(subscription.plan.weeklyPrice)} / week
                     </p>

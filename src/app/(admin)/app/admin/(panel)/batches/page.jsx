@@ -134,7 +134,11 @@ export default async function AdminBatchesPage({ searchParams }) {
         <FilterSubmit />
       </FilterBar>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
+      {/* The side panel drops below the table on a phone and tablet. The
+          `minmax(0,1fr)` track lets the table column shrink instead of
+          being forced wide by its content, which is what pushes the
+          grid sideways on a narrow screen. */}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         {/* ── Batch table ───────────────────────────────────────────── */}
         <Panel
           title="Batch register"
@@ -178,10 +182,15 @@ export default async function AdminBatchesPage({ searchParams }) {
                       <p className="text-xs text-sand-500">{batch.product.name}</p>
                     </div>
                   ),
-                  aggregator:
-                    batch.aggregator.companyName ??
-                    batch.aggregator.name ??
-                    batch.aggregator.email,
+                  aggregator: (
+                    // An aggregator's name can be a long company name; it
+                    // wraps rather than widening the table.
+                    <span className="block min-w-0 break-words">
+                      {batch.aggregator.companyName ??
+                        batch.aggregator.name ??
+                        batch.aggregator.email}
+                    </span>
+                  ),
                   harvest: formatDate(batch.harvestDate),
                   qty: `${formatQty(batch.availableQty)} kg`,
                   tier: (
@@ -200,7 +209,7 @@ export default async function AdminBatchesPage({ searchParams }) {
                     <span className="flex flex-col gap-1">
                       <StatusPill label={batch.qcStatus} tone={qcTone(batch.qcStatus)} />
                       {lastLog ? (
-                        <span className="text-[11px] text-sand-500">
+                        <span className="text-[11px] leading-snug text-sand-500">
                           Grade {lastLog.grade} · {formatDate(lastLog.inspectedAt)}
                         </span>
                       ) : null}

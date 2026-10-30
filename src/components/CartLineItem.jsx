@@ -82,15 +82,15 @@ export default function CartLineItem({ line }) {
           : "border-expired-500/30 bg-expired-50/40"
       }`}
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         {/* ── Line identity ───────────────────────────────────────── */}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="truncate text-base font-semibold text-sand-900">
+        <div className="min-w-0 flex-1 basis-48">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="min-w-0 truncate text-base font-semibold text-sand-900">
               {line.productName}
             </h3>
             <span
-              className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${presentation.badgeClass}`}
+              className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${presentation.badgeClass}`}
             >
               {presentation.label}
             </span>
@@ -112,7 +112,9 @@ export default function CartLineItem({ line }) {
         </div>
 
         {/* ── Line total ─────────────────────────────────────────── */}
-        <div className="text-right">
+        {/* The total drops under the product name on a phone rather than
+            competing with it for the same row. */}
+        <div className="shrink-0 text-left sm:text-right">
           <p className="text-lg font-semibold tracking-tight text-sand-900">
             {formatBDT(line.lineTotal)}
           </p>
@@ -124,7 +126,9 @@ export default function CartLineItem({ line }) {
 
       {/* ── Quantity controls ─────────────────────────────────────── */}
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-sand-100 pt-3">
-        <div className="flex items-center gap-2">
+        {/* The quantity label, the stepper and the remaining-stock note
+            wrap onto separate lines rather than overflowing at 320 px. */}
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
           <span className="text-xs text-sand-500">
             {formatQty(line.qty)} {formatUnit(line.unit)}
           </span>

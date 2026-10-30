@@ -76,10 +76,10 @@ export default async function SubscriptionsPage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Page header ────────────────────────────────────────────── */}
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Weekly subscriptions
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">
@@ -140,8 +140,8 @@ function ActiveSubscription({ subscription, products }) {
     <div className="mt-8 space-y-5">
       {/* ── The plan itself ────────────────────────────────────────── */}
       <article className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-5 py-4">
-          <div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-4 py-4 sm:px-5">
+          <div className="min-w-0">
             <h2 className="text-lg font-semibold tracking-tight text-sand-900">
               {plan?.name ?? "Weekly basket"}
             </h2>
@@ -155,9 +155,9 @@ function ActiveSubscription({ subscription, products }) {
 
         <div className="grid gap-px bg-sand-100 sm:grid-cols-2">
           {/* Next delivery */}
-          <div className="bg-white/80 px-5 py-4">
+          <div className="bg-white/80 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-              <CalendarClock className="size-3.5" aria-hidden="true" />
+              <CalendarClock className="size-3.5 shrink-0" aria-hidden="true" />
               {isPaused ? "Paused until" : "Next delivery"}
             </div>
 
@@ -176,9 +176,9 @@ function ActiveSubscription({ subscription, products }) {
           </div>
 
           {/* Delivery address */}
-          <div className="bg-white/80 px-5 py-4">
+          <div className="bg-white/80 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-              <MapPin className="size-3.5" aria-hidden="true" />
+              <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
               Delivering to
             </div>
 
@@ -186,7 +186,7 @@ function ActiveSubscription({ subscription, products }) {
               {address?.label ?? "Address"}
             </p>
 
-            <p className="mt-0.5 text-sm text-sand-500">
+            <p className="mt-0.5 break-words text-sm text-sand-500">
               {address
                 ? `${address.line1}${address.line2 ? `, ${address.line2}` : ""}, ${address.area}, ${address.city}`
                 : "No address on file"}
@@ -196,9 +196,9 @@ function ActiveSubscription({ subscription, products }) {
 
         {/* ── Scheduled items ────────────────────────────────────────── */}
         {composition.length > 0 ? (
-          <div className="border-t border-sand-100 px-5 py-4">
+          <div className="border-t border-sand-100 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-sand-500">
-              <Package className="size-3.5" aria-hidden="true" />
+              <Package className="size-3.5 shrink-0" aria-hidden="true" />
               Scheduled in this basket
             </div>
 
@@ -225,7 +225,7 @@ function ActiveSubscription({ subscription, products }) {
         ) : null}
 
         {/* ── Management ─────────────────────────────────────────────── */}
-        <div className="border-t border-sand-100 px-5 py-4">
+        <div className="border-t border-sand-100 px-4 py-4 sm:px-5">
           <h3 className="text-xs font-medium uppercase tracking-wide text-sand-500">
             Manage subscription
           </h3>

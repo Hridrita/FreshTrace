@@ -149,7 +149,7 @@ export default function SubscriptionSetupForm({ plans, addresses, products = [] 
                 }`}
               >
                 <span className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-semibold text-sand-900">
+                  <span className="min-w-0 break-words text-sm font-semibold text-sand-900">
                     {plan.name}
                   </span>
 
@@ -231,7 +231,7 @@ export default function SubscriptionSetupForm({ plans, addresses, products = [] 
             <select
               value={addressId}
               onChange={(event) => setAddressId(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm text-sand-900 transition focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
+              className="mt-1 w-full min-w-0 rounded-lg border border-sand-200 bg-white px-3 py-2 text-sm text-sand-900 transition focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
             >
               {savedAddresses.map((address) => (
                 <option key={address.id} value={address.id}>

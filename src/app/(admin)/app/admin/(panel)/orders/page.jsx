@@ -139,7 +139,7 @@ export default async function AdminOrdersPage({ searchParams }) {
               ),
               customer: (
                 <div>
-                  <p className="text-sand-800">
+                  <p className="break-words text-sand-800">
                     {refund.order.customer?.name ?? refund.order.customer?.email ?? "—"}
                   </p>
                   {refund.requester?.role ? (
@@ -150,7 +150,7 @@ export default async function AdminOrdersPage({ searchParams }) {
                 </div>
               ),
               reason: (
-                <span className="line-clamp-2 max-w-[16rem] text-xs text-sand-600">
+                <span className="line-clamp-2 block max-w-[16rem] break-words text-xs text-sand-600">
                   {refund.reason}
                 </span>
               ),
@@ -219,7 +219,7 @@ export default async function AdminOrdersPage({ searchParams }) {
                 ),
                 customer: (
                   <div>
-                    <p className="text-sand-800">
+                    <p className="break-words text-sand-800">
                       {order.customer?.name ?? order.customer?.email ?? "—"}
                     </p>
                     {order.customer?.phone ? (

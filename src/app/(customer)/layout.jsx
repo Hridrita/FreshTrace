@@ -52,24 +52,48 @@ export default async function CustomerLayout({ children }) {
     <div className="flex min-h-screen flex-col bg-sand-50">
       {/* ── Header ──────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 border-b border-sand-200 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/app/products"
-            className="flex items-center gap-2 font-semibold tracking-tight text-sand-900"
-          >
-            <span className="flex size-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-              <Leaf className="size-4" aria-hidden="true" />
-            </span>
-            <span className="text-lg">FreshTrace</span>
-          </Link>
+        {/*
+          Two rows on a phone, one row from `md` up. The brand and the
+          account controls sit on the first row; the navigation gets its
+          own row on a phone because there is no room for it beside the
+          brand at 320 px.
+        */}
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 sm:px-6 md:h-16 md:flex-row md:items-center md:gap-6 md:py-0 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/app/products"
+              className="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-sand-900"
+            >
+              <span className="flex size-8 items-center justify-center rounded-lg bg-brand-600 text-white">
+                <Leaf className="size-4" aria-hidden="true" />
+              </span>
+              <span className="text-lg">FreshTrace</span>
+            </Link>
 
+            {/* The signed-in user's name is the first thing that can be
+                dropped on a narrow screen — the avatar still identifies
+                them, and the name comes back from `sm` up. */}
+            {user ? (
+              <span className="ml-auto inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-sand-700 md:hidden">
+                <span className="flex size-6 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
+                  {initials(user.name, user.email)}
+                </span>
+              </span>
+            ) : null}
+          </div>
+
+          {/*
+            The navigation is a horizontally scrollable strip on a phone
+            and an inline row from `md` up. Hiding it entirely below `md`
+            would leave Orders and Subscriptions unreachable on a phone.
+          */}
           <nav
-            className="hidden items-center gap-1 text-sm font-medium text-sand-600 md:flex"
+            className="-mx-4 flex items-center gap-1 overflow-x-auto px-4 pb-0.5 text-sm font-medium text-sand-600 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:overflow-visible md:px-0 md:pb-0"
             aria-label="Main"
           >
             <Link
               href="/app/products"
-              className="rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
             >
               Catalogue
             </Link>
@@ -78,7 +102,7 @@ export default async function CustomerLayout({ children }) {
               <>
                 <Link
                   href="/app/orders"
-                  className="rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                  className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
                 >
                   Orders
                 </Link>
@@ -88,7 +112,7 @@ export default async function CustomerLayout({ children }) {
                     from any page without opening the page itself. */}
                 <Link
                   href="/app/subscriptions"
-                  className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                  className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
                 >
                   Subscriptions
                   {hasActivePlan ? (
@@ -109,7 +133,7 @@ export default async function CustomerLayout({ children }) {
                 {isAdmin ? (
                   <Link
                     href="/app/admin"
-                    className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 transition hover:bg-sand-100 hover:text-sand-900"
                   >
                     <LayoutDashboard className="size-4" aria-hidden="true" />
                     Admin Dashboard
@@ -125,11 +149,11 @@ export default async function CustomerLayout({ children }) {
                 activate a 404. */}
           </nav>
 
-          <div className="ml-auto flex items-center gap-1.5">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
             {user ? (
               <Link
                 href="/app/cart"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900"
+                className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
               >
                 <span className="relative">
                   <ShoppingBasket className="size-4" aria-hidden="true" />
@@ -145,7 +169,7 @@ export default async function CustomerLayout({ children }) {
 
             <Link
               href="/app/account"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900"
+              className="inline-flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
             >
               <User className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Account</span>
@@ -156,7 +180,7 @@ export default async function CustomerLayout({ children }) {
                 and a Log out control. */}
             {user ? (
               <div className="ml-1 flex items-center gap-1.5">
-                <span className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-700">
+                <span className="hidden items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-sand-700 md:inline-flex">
                   <span className="flex size-6 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
                     {initials(user.name, user.email)}
                   </span>
@@ -168,13 +192,13 @@ export default async function CustomerLayout({ children }) {
               <div className="ml-1 flex items-center gap-1.5">
                 <Link
                   href="/login"
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900"
+                  className="rounded-lg px-2.5 py-2 text-sm font-medium text-sand-600 transition hover:bg-sand-100 hover:text-sand-900 sm:px-3"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
-                  className="rounded-lg bg-brand-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
+                  className="rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 sm:px-3.5"
                 >
                   Register
                 </Link>
@@ -186,17 +210,6 @@ export default async function CustomerLayout({ children }) {
 
       {/* ── Main ────────────────────────────────────────────────────── */}
       <main className="flex-1">{children}</main>
-
-      {/* ── Footer ──────────────────────────────────────────────────── */}
-      <footer className="border-t border-sand-200 bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-sand-500 sm:flex-row sm:px-6 lg:px-8">
-          <p>
-            FreshTrace — farm-to-table produce with visible freshness, delivered
-            in Dhaka.
-          </p>
-          <p>Every batch is traceable back to its harvest.</p>
-        </div>
-      </footer>
     </div>
   );
 }

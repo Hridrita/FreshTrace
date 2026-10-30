@@ -23,7 +23,9 @@ import { Leaf, MapPin, Sprout, Truck } from "lucide-react";
  */
 export default function AuthShell({ children, title, subtitle, footer }) {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 via-sand-50 to-brand-100">
+    // `overflow-x-clip` trims the decorative blobs that sit outside the
+    // viewport without creating a scroll container.
+    <div className="relative min-h-screen overflow-x-clip bg-gradient-to-br from-brand-50 via-sand-50 to-brand-100">
       {/* ── Ambient colour blobs ───────────────────────────────────────
           These sit behind the cards so `backdrop-blur` has something to
           diffuse. They are decorative only. */}
@@ -54,9 +56,9 @@ export default function AuthShell({ children, title, subtitle, footer }) {
 
         <div className="grid w-full items-center gap-8 lg:grid-cols-2 lg:gap-14">
           {/* ── Form column ──────────────────────────────────────────── */}
-          <div className="w-full">
-            <div className="rounded-card border border-white/40 bg-white/70 p-6 shadow-xl backdrop-blur-md sm:p-8">
-              <h1 className="text-2xl font-semibold tracking-tight text-sand-900">
+          <div className="w-full min-w-0">
+            <div className="rounded-card border border-white/40 bg-white/70 p-5 shadow-xl backdrop-blur-md sm:p-8">
+              <h1 className="text-xl font-semibold tracking-tight text-sand-900 sm:text-2xl">
                 {title}
               </h1>
               <p className="mt-2 text-sm leading-relaxed text-sand-600">
@@ -91,7 +93,7 @@ export default function AuthShell({ children, title, subtitle, footer }) {
  */
 function PromoCard() {
   return (
-    <div className="relative overflow-hidden rounded-card border border-white/40 bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 p-8 text-white shadow-xl backdrop-blur-md sm:p-10">
+    <div className="relative overflow-hidden rounded-card border border-white/40 bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 p-6 text-white shadow-xl backdrop-blur-md sm:p-10">
       {/* A soft light source in the corner, so the panel has depth. */}
       <div
         className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-brand-400/40 blur-3xl"
@@ -103,12 +105,12 @@ function PromoCard() {
       />
 
       <div className="relative">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-brand-50 backdrop-blur-sm">
-          <Sprout className="size-3.5" aria-hidden="true" />
-          Farm-to-table, delivered in Dhaka
+        <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-brand-50 backdrop-blur-sm">
+          <Sprout className="size-3.5 shrink-0" aria-hidden="true" />
+          <span className="min-w-0">Farm-to-table, delivered in Dhaka</span>
         </span>
 
-        <h2 className="mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">
+        <h2 className="mt-5 text-xl font-semibold tracking-tight sm:text-3xl">
           Know exactly when it was picked.
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-brand-50/90">
@@ -117,26 +119,26 @@ function PromoCard() {
         </p>
 
         {/* ── Produce motifs ─────────────────────────────────────────── */}
-        <div className="mt-8 flex items-end gap-3">
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-            <Leaf className="size-7" strokeWidth={1.25} aria-hidden="true" />
+        <div className="mt-8 flex flex-wrap items-end gap-3">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm sm:size-14">
+            <Leaf className="size-6 sm:size-7" strokeWidth={1.25} aria-hidden="true" />
           </span>
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-            <Sprout className="size-7" strokeWidth={1.25} aria-hidden="true" />
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm sm:size-14">
+            <Sprout className="size-6 sm:size-7" strokeWidth={1.25} aria-hidden="true" />
           </span>
-          <span className="flex size-14 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm">
-            <Truck className="size-7" strokeWidth={1.25} aria-hidden="true" />
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur-sm sm:size-14">
+            <Truck className="size-6 sm:size-7" strokeWidth={1.25} aria-hidden="true" />
           </span>
         </div>
 
         {/* ── Frosted badges ─────────────────────────────────────────── */}
         <ul className="mt-8 flex flex-wrap gap-2.5">
           <li className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
-            <Sprout className="size-3.5" aria-hidden="true" />
+            <Sprout className="size-3.5 shrink-0" aria-hidden="true" />
             Harvested today
           </li>
           <li className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-md">
-            <MapPin className="size-3.5" aria-hidden="true" />
+            <MapPin className="size-3.5 shrink-0" aria-hidden="true" />
             Traceable batches
           </li>
         </ul>

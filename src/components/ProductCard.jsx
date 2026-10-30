@@ -106,9 +106,12 @@ export default function ProductCard({ product, bestBatch }) {
 
         <div className="mt-auto space-y-3">
           {/* ── Price ─────────────────────────────────────────────── */}
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <div className="flex items-baseline gap-1.5">
+          {/* The price and the remaining stock stack on a narrow card and
+              sit side by side from `xs` up. On a 320 px phone the two
+              columns would otherwise push the price onto two lines. */}
+          <div className="flex flex-wrap items-end justify-between gap-x-2 gap-y-1">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-baseline gap-x-1.5">
                 <span className="text-xl font-semibold tracking-tight text-sand-900">
                   {formatBDT(unitPrice)}
                 </span>
@@ -124,7 +127,7 @@ export default function ProductCard({ product, bestBatch }) {
             </div>
 
             {hasStock ? (
-              <p className="text-right text-xs text-sand-500">
+              <p className="text-left text-xs text-sand-500 sm:text-right">
                 {formatQty(bestBatch.availableQty)} {product.defaultUnit} left
               </p>
             ) : null}

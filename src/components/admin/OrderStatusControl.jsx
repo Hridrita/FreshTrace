@@ -62,17 +62,20 @@ export default function OrderStatusControl({ orderId, currentStatus, allowedStat
   }
 
   return (
-    <span className="inline-flex flex-col items-start gap-1">
-      <span className="inline-flex items-center gap-1.5">
+    // The control lives in a table cell, so it must not force the column
+    // wide. `max-w` + `truncate` keeps the select compact, and the
+    // `min-w-0` lets the flex child shrink inside the cell.
+    <span className="inline-flex max-w-[9rem] flex-col items-start gap-1">
+      <span className="inline-flex min-w-0 items-center gap-1.5">
         {pending ? (
-          <Loader2 className="size-3.5 animate-spin text-sand-400" aria-hidden="true" />
+          <Loader2 className="size-3.5 shrink-0 animate-spin text-sand-400" aria-hidden="true" />
         ) : null}
         <select
           value=""
           onChange={handleChange}
           disabled={pending}
           aria-label="Change order status"
-          className="rounded-full border border-sand-200 bg-white/80 px-2.5 py-1 text-xs text-sand-600 outline-none transition hover:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200/60 disabled:opacity-60"
+          className="min-w-0 max-w-full truncate rounded-full border border-sand-200 bg-white/80 px-2.5 py-1 text-xs text-sand-600 outline-none transition hover:bg-white focus:border-brand-400 focus:ring-2 focus:ring-brand-200/60 disabled:opacity-60"
         >
           <option value="">Move to…</option>
           {allowedStatuses.map((status) => (
@@ -84,7 +87,7 @@ export default function OrderStatusControl({ orderId, currentStatus, allowedStat
       </span>
 
       {error ? (
-        <span role="alert" className="text-[11px] text-expired-700">
+        <span role="alert" className="break-words text-[11px] text-expired-700">
           {error}
         </span>
       ) : null}

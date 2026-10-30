@@ -25,15 +25,15 @@ export default function BatchCard({ batch, unit }) {
 
   return (
     <article className="overflow-hidden rounded-card border border-sand-200 bg-white shadow-soft">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/60 px-4 py-3">
-        <div className="flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-b border-sand-100 bg-sand-50/60 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-2.5">
           <FreshnessBadge tier={batch.tier} size="sm" />
-          <span className="text-sm font-medium text-sand-700">
+          <span className="min-w-0 break-words text-sm font-medium text-sand-700">
             {presentation.description}
           </span>
         </div>
 
-        <div className="flex items-baseline gap-1.5">
+        <div className="flex shrink-0 flex-wrap items-baseline gap-x-1.5">
           <span className="text-lg font-semibold tracking-tight text-sand-900">
             {formatBDT(batch.unitPrice)}
           </span>
@@ -69,10 +69,12 @@ export default function BatchCard({ batch, unit }) {
         </DetailRow>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-sand-100 px-4 py-3 text-xs text-sand-500">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-sand-100 px-4 py-3 text-xs text-sand-500">
         <span className="font-mono">{batch.batchCode}</span>
         {batch.aggregator?.companyName || batch.aggregator?.name ? (
-          <span>Supplied by {batch.aggregator.companyName ?? batch.aggregator.name}</span>
+          <span className="min-w-0 break-words">
+            Supplied by {batch.aggregator.companyName ?? batch.aggregator.name}
+          </span>
         ) : null}
       </div>
     </article>

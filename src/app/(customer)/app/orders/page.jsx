@@ -31,10 +31,10 @@ export default async function OrdersPage() {
   const orders = await listOrders(user.id);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* ── Page header ────────────────────────────────────────────── */}
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight text-sand-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-sand-900 sm:text-3xl">
           Your orders
         </h1>
         <p className="mt-2 text-base leading-relaxed text-sand-600">
@@ -44,7 +44,7 @@ export default async function OrdersPage() {
       </div>
 
       {orders.length === 0 ? (
-        <div className="mt-8 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-20 text-center">
+        <div className="mt-8 flex flex-col items-center justify-center rounded-card border border-dashed border-sand-300 bg-white px-6 py-14 text-center sm:py-20">
           <span className="flex size-12 items-center justify-center rounded-full bg-sand-100 text-sand-400">
             <PackageSearch className="size-6" aria-hidden="true" />
           </span>
@@ -69,7 +69,7 @@ export default async function OrdersPage() {
               className="overflow-hidden rounded-card border border-white/40 bg-white/70 shadow-soft backdrop-blur-md"
             >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-sand-100 bg-sand-50/50 px-4 py-3">
-                <div>
+                <div className="min-w-0">
                   <p className="font-mono text-sm font-medium text-sand-900">
                     {order.orderCode}
                   </p>
@@ -89,7 +89,7 @@ export default async function OrdersPage() {
                       className="flex items-baseline justify-between gap-3 text-sm"
                     >
                       <span className="min-w-0">
-                        <span className="font-medium text-sand-800">
+                        <span className="block break-words font-medium text-sand-800">
                           {item.name}
                         </span>
                         <span className="ml-2 text-xs text-sand-500">
@@ -116,7 +116,7 @@ export default async function OrdersPage() {
 
                   <Link
                     href={`/app/orders/${order.id}`}
-                    className="rounded-lg border border-sand-200 bg-white px-3 py-1.5 text-sm font-medium text-sand-700 transition hover:bg-sand-50"
+                    className="shrink-0 rounded-lg border border-sand-200 bg-white px-3 py-1.5 text-sm font-medium text-sand-700 transition hover:bg-sand-50"
                   >
                     View details
                   </Link>
