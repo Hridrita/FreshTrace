@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
@@ -7,6 +6,7 @@ import {
   QrCode,
   ShieldCheck,
 } from "lucide-react";
+import { FadeIn, PressableLink, Stagger, StaggerItem } from "./animation";
 
 /**
  * Hero — the landing page's opening section.
@@ -29,6 +29,13 @@ import {
  * carries no imagery, and a fabricated photo would be a lie the product can't
  * back up. It shows a real batch's fields — harvest date, district, tier,
  * batch code — which is exactly what a shopper sees in the app.
+ *
+ * ## Motion
+ *
+ * The hero is the first thing on the page, so its copy animates in on load
+ * rather than waiting to be scrolled into view: the eyebrow, the headline,
+ * the subtext, the CTAs and the trust strip each rise in turn, and the
+ * buttons lift on hover and press on tap.
  */
 export default function Hero() {
   return (
@@ -54,95 +61,108 @@ export default function Hero() {
           {/* ── Copy column ────────────────────────────────────────────── */}
           <div className="min-w-0">
             {/* ── Eyebrow ─────────────────────────────────────────────── */}
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-3 py-1 text-xs font-medium text-brand-800 shadow-soft backdrop-blur-sm">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-fresh-400 opacity-60" />
-                <span className="relative inline-flex size-2 rounded-full bg-fresh-500" />
+            <FadeIn delay={0}>
+              <span className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-3 py-1 text-xs font-medium text-brand-800 shadow-soft backdrop-blur-sm">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-fresh-400 opacity-60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-fresh-500" />
+                </span>
+                Live traceability, Dhaka
               </span>
-              Live traceability, Dhaka
-            </span>
+            </FadeIn>
 
             {/* ── Headline ────────────────────────────────────────────── */}
-            <h1 className="mt-6 text-4xl font-semibold tracking-tight text-sand-900 sm:text-5xl lg:text-6xl">
-              Know exactly{" "}
-              <span className="relative whitespace-nowrap text-brand-700">
-                when it was
-                <svg
-                  className="absolute -bottom-1 left-0 h-3 w-full text-brand-300"
-                  viewBox="0 0 200 12"
-                  fill="none"
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M2 8c40-6 80-8 120-6 20 1 40 3 76 1"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>{" "}
-              picked.
-            </h1>
+            <FadeIn delay={0.08}>
+              <h1 className="mt-6 text-4xl font-semibold tracking-tight text-sand-900 sm:text-5xl lg:text-6xl">
+                Know exactly{" "}
+                <span className="relative whitespace-nowrap text-brand-700">
+                  when it was
+                  <svg
+                    className="absolute -bottom-1 left-0 h-3 w-full text-brand-300"
+                    viewBox="0 0 200 12"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M2 8c40-6 80-8 120-6 20 1 40 3 76 1"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>{" "}
+                picked.
+              </h1>
+            </FadeIn>
 
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-sand-600 sm:text-lg">
-              FreshTrace connects farmers to your table with an unbroken chain
-              of custody. Every batch carries its harvest date, its origin
-              district and a tamper-proof log — so the price you pay always
-              matches how fresh the produce actually is.
-            </p>
+            <FadeIn delay={0.16}>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-sand-600 sm:text-lg">
+                FreshTrace connects farmers to your table with an unbroken chain
+                of custody. Every batch carries its harvest date, its origin
+                district and a tamper-proof log — so the price you pay always
+                matches how fresh the produce actually is.
+              </p>
+            </FadeIn>
 
             {/* ── CTAs ─────────────────────────────────────────────────── */}
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link
-                href="/app/products"
-                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lifted transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 sm:w-auto"
-              >
-                Explore Catalog
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
-              </Link>
+            <FadeIn delay={0.24}>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <PressableLink
+                  href="/app/products"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lifted transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+                >
+                  Explore Catalog
+                  <ArrowRight
+                    className="size-4 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                  />
+                </PressableLink>
 
-              <Link
-                href="/app/products"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sand-300 bg-white/80 px-6 py-3.5 text-sm font-semibold text-sand-800 shadow-soft backdrop-blur-sm transition hover:border-brand-300 hover:bg-white hover:text-brand-800 sm:w-auto"
-              >
-                <QrCode className="size-4" aria-hidden="true" />
-                Track a Product
-              </Link>
+                <PressableLink
+                  href="/app/products"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-sand-300 bg-white/80 px-6 py-3.5 text-sm font-semibold text-sand-800 shadow-soft backdrop-blur-sm transition hover:border-brand-300 hover:bg-white hover:text-brand-800"
+                >
+                  <QrCode className="size-4" aria-hidden="true" />
+                  Track a Product
+                </PressableLink>
 
-              <Link
-                href="/register"
-                className="inline-flex w-full items-center justify-center gap-2 px-2 py-3.5 text-sm font-semibold text-sand-600 transition hover:text-brand-700 sm:w-auto sm:px-3"
-              >
-                Sign In / Get Started
-                <ArrowRight className="size-4" aria-hidden="true" />
-              </Link>
-            </div>
+                <PressableLink
+                  href="/register"
+                  className="inline-flex items-center justify-center gap-2 px-2 py-3.5 text-sm font-semibold text-sand-600 transition hover:text-brand-700 sm:px-3"
+                >
+                  Sign In / Get Started
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </PressableLink>
+              </div>
+            </FadeIn>
 
             {/* ── Trust strip ─────────────────────────────────────────── */}
-            <ul className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-sand-600">
-              <li className="flex items-center gap-2">
+            <Stagger
+              as="ul"
+              stagger={0.1}
+              delay={0.32}
+              className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-sand-600"
+            >
+              <StaggerItem index={0} className="flex items-center gap-2">
                 <ShieldCheck className="size-4 shrink-0 text-brand-600" aria-hidden="true" />
                 QC inspected at intake
-              </li>
-              <li className="flex items-center gap-2">
+              </StaggerItem>
+              <StaggerItem index={1} className="flex items-center gap-2">
                 <CalendarCheck className="size-4 shrink-0 text-brand-600" aria-hidden="true" />
                 Harvest date on every batch
-              </li>
-              <li className="flex items-center gap-2">
+              </StaggerItem>
+              <StaggerItem index={2} className="flex items-center gap-2">
                 <BadgeCheck className="size-4 shrink-0 text-brand-600" aria-hidden="true" />
                 Direct from aggregators
-              </li>
-            </ul>
+              </StaggerItem>
+            </Stagger>
           </div>
 
           {/* ── Visual column ───────────────────────────────────────────── */}
-          <div className="min-w-0 lg:pl-4">
+          <FadeIn delay={0.2} y={36} className="min-w-0 lg:pl-4">
             <TraceCard />
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>
