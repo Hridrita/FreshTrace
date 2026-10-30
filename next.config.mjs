@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   /* config options here */
   // OneDrive-backed working directories can hold file locks on `.next`,
   // which breaks `next build`'s clean step. `NEXT_DIST_DIR` lets the build
