@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { PackageSearch } from "lucide-react";
 import OrderStatusBadge from "@/components/OrderStatusBadge";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { listOrders } from "@/lib/services/orders";
 import { formatBDT, formatDate, formatQty } from "@/lib/freshness";
 
@@ -21,12 +20,9 @@ export const metadata = {
 };
 
 export default async function OrdersPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Forders");
-  }
+  // Orders belong to an account, so a signed-out visitor is sent to the
+  // login screen and returned here afterwards.
+  const user = await requireCustomerSession("/app/orders");
 
   const orders = await listOrders(user.id);
 

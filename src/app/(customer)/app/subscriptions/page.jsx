@@ -1,9 +1,8 @@
-import { redirect } from "next/navigation";
 import { CalendarClock, MapPin, Package } from "lucide-react";
 import SubscriptionControls from "@/components/SubscriptionControls";
 import SubscriptionSetupForm from "@/components/SubscriptionSetupForm";
 import SubscriptionStatusBadge from "@/components/SubscriptionStatusBadge";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { prisma } from "@/lib/prisma";
 import {
   getCurrentSubscription,
@@ -50,12 +49,9 @@ const WEEKDAY_NAMES = [
 ];
 
 export default async function SubscriptionsPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Fsubscriptions");
-  }
+  // A weekly basket belongs to an account, so a signed-out visitor is sent
+  // to the login screen and returned here afterwards.
+  const user = await requireCustomerSession("/app/subscriptions");
 
   const [subscription, plans] = await Promise.all([
     getCurrentSubscription(user.id),

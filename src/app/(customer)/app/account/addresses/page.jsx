@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft, MapPin } from "lucide-react";
 import AddressManager from "@/components/AddressManager";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { listAddresses } from "@/lib/services/addresses";
 import { toAddressViews } from "@/lib/account-view";
 
@@ -22,12 +21,9 @@ export const metadata = {
 };
 
 export default async function AccountAddressesPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Faccount%2Faddresses");
-  }
+  // Delivery addresses belong to an account, so a signed-out visitor is sent
+  // to the login screen and returned here afterwards.
+  const user = await requireCustomerSession("/app/account/addresses");
 
   const addresses = await listAddresses(user.id);
 

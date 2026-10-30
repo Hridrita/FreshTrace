@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
   ArrowRight,
   CalendarClock,
@@ -11,7 +10,7 @@ import {
 import AddressManager from "@/components/AddressManager";
 import ProfileForm from "@/components/ProfileForm";
 import SubscriptionStatusBadge from "@/components/SubscriptionStatusBadge";
-import { getSession } from "@/lib/auth/session";
+import { requireCustomerSession } from "@/lib/auth/page-guard";
 import { prisma } from "@/lib/prisma";
 import {
   getCurrentSubscription,
@@ -46,12 +45,9 @@ export const metadata = {
 };
 
 export default async function AccountPage() {
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  if (!user) {
-    redirect("/login?next=%2Fapp%2Faccount");
-  }
+  // The account page is the customer's own, so a signed-out visitor is sent
+  // to the login screen and returned here afterwards.
+  const user = await requireCustomerSession("/app/account");
 
   // The subscription, the addresses, the orders and the product names for
   // the basket preview are independent reads, so they run together.
