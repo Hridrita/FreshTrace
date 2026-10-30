@@ -39,4 +39,11 @@ jobs:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          # The action defaults to vercel@25.1.0, which cannot resolve a
+          # project from VERCEL_ORG_ID/VERCEL_PROJECT_ID alone and fails with
+          # "Could not retrieve Project Settings" — there is no linked
+          # .vercel/project.json in CI, because that directory is git-ignored.
+          # Vercel CLI 31 is the first release that honours those environment
+          # variables, so the CLI is pinned explicitly.
+          vercel-version: '31.0.0'
           vercel-args: '--prod'
